@@ -8,7 +8,10 @@ const getcategory = (req, res)=>{
         if(error) throw error
         var objs = [];
         if (results === undefined || results.length == 0){
-            return res.send("Empty");
+            return res.status(400).send({
+                message: "ไม่พบข้อมูลในขณะนี้",
+                status: 404
+            });
         }
         for (var i = 0;i < results.length; i++) {
             objs.push({
@@ -25,11 +28,14 @@ const getcategory = (req, res)=>{
 }
 
 const getnewproduct = (req, res)=>{
-    conn.query(`SELECT * FROM product ORDER BY secretid DESC LIMIT 6`, (error, results, fields)=>{
+    conn.query(`SELECT * FROM product WHERE status = "active" ORDER BY secretid DESC LIMIT 6`, (error, results, fields)=>{
         if(error) throw error
         var objs = [];
         if (results === undefined || results.length == 0){
-            return res.send("Empty");
+            return res.status(400).send({
+                message: "ไม่พบข้อมูลในขณะนี้",
+                status: 404
+            });
         }
         for (var i = 0;i < results.length; i++) {
             objs.push({
@@ -53,7 +59,10 @@ const getproducts = (req, res)=>{
         if(error) throw error;
         var objs = [];
         if (results === undefined || results.length == 0){
-            return res.send("Empty");
+            return res.status(400).send({
+                message: "ไม่พบข้อมูลในขณะนี้",
+                status: 404
+            });
         }
         for (var i = 0;i < results.length; i++) {
             objs.push({
@@ -78,8 +87,8 @@ const getregisteringproducts = (req, res)=>{
         var objs = [];
         if (results === undefined || results.length == 0){
             return res.status(400).send({
-                message: "ไม่มีสินค้าในขณะนี้",
-                status: 400
+                message: "ไม่พบข้อมูลในขณะนี้",
+                status: 404
             });
         }
         for (var i = 0;i < results.length; i++) {

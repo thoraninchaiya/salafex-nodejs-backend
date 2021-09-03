@@ -18,7 +18,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors())
-app.use(express.static(path.join(__dirname, 'store')));
 
 // app.use(cors({
 //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

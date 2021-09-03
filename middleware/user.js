@@ -29,7 +29,7 @@ module.exports = {
         // console.log(req)
         if(!req.headers.authorization){
             return res.status(400).send({
-                message: "กรุณาเข้าสู่ระบบใหม่ header",
+                message: "กรุณาเข้าสู่ระบบใหม่",
                 status: 400
             })
         }
