@@ -65,6 +65,7 @@ app.post('/admin/product/del', aproduct.delproduct)
 //cart
 app.get('/getcart', userMiddleware.isLoggedIn, cart.getcart); //get cart
 app.post('/addcart', userMiddleware.isLoggedIn, cart.addcart); //add cart
+app.patch('/updatecart', userMiddleware.isLoggedIn, cart.updatecart); //update cart
 app.post('/removecart', userMiddleware.isLoggedIn, cart.removecart); //remove cart
 
 //buy product

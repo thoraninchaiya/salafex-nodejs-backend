@@ -78,6 +78,13 @@ const addcart = (req, res) => {
     })
 }
 
+//update cart
+const updatecart = (req, res) => {
+
+}
+
+
+//remove cart
 const removecart = (req, res) => {
     
 }
@@ -88,8 +95,10 @@ const removecart = (req, res) => {
 // })
 
 
+
 module.exports = {
     getcart,
     addcart,
+    updatecart,
     removecart
 }
