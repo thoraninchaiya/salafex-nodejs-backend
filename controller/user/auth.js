@@ -15,7 +15,6 @@ const register = (req, res, next) => {
                     }else{
                         conn.query(`INSERT INTO users (email, password, fname, lname, phone, addr, uuid) VALUES (${conn.escape(req.body.email)}, '${hash}', '${req.body.fname}', '${req.body.lname}', '${req.body.phone}','${req.body.address}', '${uuidv4()}')`, (err, results) => {
                             if(err){
-                                // throw err
                                 return res.status(400).send({message: "ระบบล้มเหลวกรุณาติดต่อผู้ดูแลระบบ"});
                             }
                             conn.query(`SELECT * FROM users WHERE LOWER(email) = LOWER('${req.body.email}')`, (err, results1) =>{
@@ -98,7 +97,8 @@ const route = (req, res)=>{
 
     conn.query(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
         if(err){
-            throw err
+            return res.status(400).send({message: "ระบบล้มเหลวกรุณาลองใหม่อีกครั้ง"});
+            // throw err
         }
 
         res.status(200).send({

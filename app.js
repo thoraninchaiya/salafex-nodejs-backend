@@ -12,6 +12,7 @@ const carousel = require('./controller/carousel');
 const userauth = require('./controller/user/auth');
 const product = require('./controller/product/product');
 const getprofile = require('./controller/user/profile');
+const cart = require('./controller/product/cart');
 var conn = require('./connect');
 
 app.use(express.json());
@@ -60,6 +61,11 @@ app.get('/admin/product/get', aproduct.getproduct)
 app.post('/admin/product/add', aproduct.addproduct)
 app.post('/admin/product/edit', aproduct.editproduct)
 app.post('/admin/product/del', aproduct.delproduct)
+
+//cart
+app.get('/getcart', userMiddleware.isLoggedIn, cart.getcart); //get cart
+app.post('/addcart', userMiddleware.isLoggedIn, cart.addcart); //add cart
+app.post('/removecart', userMiddleware.isLoggedIn, cart.removecart); //remove cart
 
 //buy product
 app.post('/buyproduct', userMiddleware.isLoggedIn, product.buyproduct)

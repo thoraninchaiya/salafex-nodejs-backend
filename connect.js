@@ -4,7 +4,8 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '251242',
-    database: 'salafex'
+    database: 'salafex',
+    queueLimit: 1000
 });
 
 module.exports = connection;
