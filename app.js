@@ -4,17 +4,21 @@ const app = express();
 const port = 8080;
 var path = require('path');
 const userMiddleware = require('./middleware/user');
-// const mysql = require('mysql2');
 const bodyParser = require('body-parser');
-const uproduct = require('./controller/user/product');
-const aproduct = require('./controller/admin/product');
-// const carousel = require('./controller/carousel');
-const carousel = require('./router/view/carousel'); //test route get carousel
-const userauth = require('./controller/user/auth');
-const product = require('./controller/product/product');
-const userdata = require('./controller/user/user');
-const cart = require('./controller/product/cart');
 var conn = require('./connect');
+
+
+//router
+const carousel = require('./router/view/carousel'); //carousel
+const product = require('./router/view/product'); //product
+
+
+
+// const aproduct = require('./controller/admin/product');
+const userauth = require('./controller/user/auth');
+const userdata = require('./controller/user/user');
+const cart = require('./controller/cart');
+
 
 app.use(express.json());
 // app.use(bodyParser.json());
@@ -43,15 +47,12 @@ app.get('/', (req, res) => {
 
 //get carousel
 // app.get('/getcarousel', carousel.getcarousel)
-app.use('/carousel', carousel)
-// app.use('/articles', articleRouter)
+// app.use('/carousel', carousel)
+// app.use('/products', product)
 
 
 //user
-app.get('/category', uproduct.getcategory)
-app.get('/products', uproduct.getproducts)
-app.get('/registeringproducts', uproduct.getregisteringproducts)
-app.get('/newproduct', uproduct.getnewproduct)
+// app.get('/category', uproduct.getcategory)
 app.get('/user/profile', userMiddleware.isLoggedIn, userdata.profile)
 app.get('/user/info', userMiddleware.isLoggedIn, userdata.userinfo)
 // app.post('/user/profile', getprofile.profile)
@@ -62,10 +63,10 @@ app.post('/auth/register', userMiddleware.validateRegister, userauth.register)
 app.get('/auth/route', userMiddleware.isLoggedIn, userauth.route)
 
 //admin
-app.get('/admin/product/get', aproduct.getproduct)
-app.post('/admin/product/add', aproduct.addproduct)
-app.post('/admin/product/edit', aproduct.editproduct)
-app.post('/admin/product/del', aproduct.delproduct)
+// app.get('/admin/product/get', aproduct.getproduct)
+// app.post('/admin/product/add', aproduct.addproduct)
+// app.post('/admin/product/edit', aproduct.editproduct)
+// app.post('/admin/product/del', aproduct.delproduct)
 
 //cart
 app.get('/getcart', userMiddleware.isLoggedIn, cart.getcart); //get cart
@@ -74,56 +75,8 @@ app.patch('/updatecart', userMiddleware.isLoggedIn, cart.updatecart); //update c
 app.post('/removecart', userMiddleware.isLoggedIn, cart.removecart); //remove cart
 
 //buy product
-app.post('/buyproduct', userMiddleware.isLoggedIn, product.buyproduct)
+// app.post('/buyproduct', userMiddleware.isLoggedIn, product.buyproduct)
 
-
-//test product
-app.get('/testproduct', (req, res) =>{
-    // dbCon.query('SELECT qty FROM product where id="M101"', (error, results, fields)=>{
-    //     if(error) throw error;
-    //     let message = ""
-    //     let type = (typeof results)
-    //     if (results === undefined || results.length == 0){
-    //         message = "Empty";
-    //     }else{
-    //         message = "Success";
-    //     }
-
-    //     return res.send({error: false, data: results, type: type, message: message});
-    // })
-
-    conn.query('SELECT * FROM product', (err, results, fields)=>{
-        // let test = results.cost
-        // let numtesttest = test
-        // var a  = numtesttest.toString();
-        // return res.send(a);
-
-        // let test = results.name
-        // let numtesttest = test
-        // var a  = numtesttest.toString();
-        // let type = (typeof test)
-        // return res.send(type);
-
-        // var count = results.length
-        // var a  = count.toString();
-        // let type = (typeof a)
-        // res.send(a);
-
-        var objs = [];
-        for (var i = 0;i < results.length; i++) {
-            objs.push({
-              id: results[i].secretid,
-              pid: results[i].id,
-              name: results[i].name,
-              price: results[i].price
-            });
-        }
-        // res.writeHead(400, { 'Content-Type': 'text/plain' });
-        res.setHeader("Content-Type", "application/json");
-        res.send(JSON.stringify(objs));
-        res.end();
-    })
-})
 
 app.listen(port, () => {
   console.log(`Running on http://localhost:${port}`)

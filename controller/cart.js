@@ -1,5 +1,5 @@
-var conn = require('../../connect');
-var config = require('../../config');
+var conn = require('../connect');
+var config = require('../config');
 
 const getcart = (req, res) => {
     conn.query(`select * from users where uuid = '${req.userData.uuid}'`, (err, userresults) =>{
