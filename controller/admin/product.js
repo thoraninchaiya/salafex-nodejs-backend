@@ -1,5 +1,6 @@
 var conn = require('../../connect');
 
+
 const getproduct = (req, res)=>{
     var sqlget = `SELECT * FROM product`;
     var sqlsearch = `SELECT * FORM product WHERE id = ?`;

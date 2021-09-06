@@ -8,16 +8,17 @@ const userMiddleware = require('./middleware/user');
 const bodyParser = require('body-parser');
 const uproduct = require('./controller/user/product');
 const aproduct = require('./controller/admin/product');
-const carousel = require('./controller/carousel');
+// const carousel = require('./controller/carousel');
+const carousel = require('./router/view/carousel'); //test route get carousel
 const userauth = require('./controller/user/auth');
 const product = require('./controller/product/product');
-const getprofile = require('./controller/user/profile');
+const userdata = require('./controller/user/user');
 const cart = require('./controller/product/cart');
 var conn = require('./connect');
 
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors())
 
 // app.use(cors({
@@ -41,14 +42,18 @@ app.get('/', (req, res) => {
 })
 
 //get carousel
-app.get('/getcarousel', carousel.getcarousel)
+// app.get('/getcarousel', carousel.getcarousel)
+app.use('/carousel', carousel)
+// app.use('/articles', articleRouter)
+
 
 //user
 app.get('/category', uproduct.getcategory)
 app.get('/products', uproduct.getproducts)
 app.get('/registeringproducts', uproduct.getregisteringproducts)
 app.get('/newproduct', uproduct.getnewproduct)
-app.get('/user/profile', userMiddleware.isLoggedIn, getprofile.profile)
+app.get('/user/profile', userMiddleware.isLoggedIn, userdata.profile)
+app.get('/user/info', userMiddleware.isLoggedIn, userdata.userinfo)
 // app.post('/user/profile', getprofile.profile)
 
 //user auth
@@ -72,7 +77,7 @@ app.post('/removecart', userMiddleware.isLoggedIn, cart.removecart); //remove ca
 app.post('/buyproduct', userMiddleware.isLoggedIn, product.buyproduct)
 
 
-//get product
+//test product
 app.get('/testproduct', (req, res) =>{
     // dbCon.query('SELECT qty FROM product where id="M101"', (error, results, fields)=>{
     //     if(error) throw error;

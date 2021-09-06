@@ -2,6 +2,7 @@ var conn = require('../../connect');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+// const conn = connect.promise();
 
 const register = (req, res, next) => {
     conn.query(`SELECT id FROM users WHERE LOWER(email) = LOWER('${req.body.email}')`, (err, results) => {
