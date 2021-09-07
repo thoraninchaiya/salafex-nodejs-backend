@@ -27,6 +27,12 @@ const categroys = (req, res)=>{
     })
 }
 
+//get category
+const categroy = (req, res)=>{
+
+}
+
 module.exports = {
-    categroys
+    categroys,
+    categroy
 }

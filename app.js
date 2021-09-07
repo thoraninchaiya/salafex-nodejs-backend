@@ -5,12 +5,21 @@ const port = 8080;
 var path = require('path');
 const userMiddleware = require('./middleware/user');
 const bodyParser = require('body-parser');
-var conn = require('./connect');
 
 
 //router
 const carousel = require('./router/view/carousel'); //carousel
 const product = require('./router/view/product'); //product
+const category = require('./router/view/category'); //category
+
+//router use
+app.use('/carousel', carousel)
+app.use('/product', product)
+app.use('/category', category)
+
+
+
+
 
 
 
@@ -44,11 +53,6 @@ app.get('/', (req, res) => {
       published_on: 'https://thoranin.org'
     })
 })
-
-//get carousel
-// app.get('/getcarousel', carousel.getcarousel)
-// app.use('/carousel', carousel)
-// app.use('/products', product)
 
 
 //user
