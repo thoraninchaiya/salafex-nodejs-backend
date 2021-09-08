@@ -10,7 +10,6 @@ const buyproduct = (req, res) => {
         if(err){
             throw err
         }
-
         res.status(200).send({
             email: req.userData.email,
             data: req.userData,
