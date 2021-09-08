@@ -2,7 +2,7 @@ var conn = require('../connect');
 var config = require('../config');
 
 const getcart = (req, res) => {
-    conn.query(`select * from users where uuid = '${req.userData.uuid}'`, (err, userresults) =>{
+    conn.execute(`select * from users where uuid = '${req.userData.uuid}'`, (err, userresults) =>{
         try{
             if(err){
                 return res.status(400).send({
@@ -10,7 +10,7 @@ const getcart = (req, res) => {
                     status: 400
                 })
             }
-            conn.query(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.id WHERE users_id = '${userresults[0]['id']}'`, (err, cartresult) => {
+            conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.id WHERE users_id = '${userresults[0]['id']}'`, (err, cartresult) => {
                 var objs = [];
                 try{
                     if(err){
@@ -57,7 +57,7 @@ const getcart = (req, res) => {
 // add cart
 const addcart = (req, res) => {
     // console.log(req)
-    // conn.query(`select * from product`, (err, results) =>{
+    // conn.execute(`select * from product`, (err, results) =>{
     //     if(err){
     //         throw err
     //     }

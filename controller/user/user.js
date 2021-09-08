@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 //การขอคีเควสผู้ใช้
 const info = (req, res)=>{
-    conn.query(`select * from users where uuid = '${req.userData.uuid}'`, (err, results)=>{
+    conn.execute(`select * from users where uuid = '${req.userData.uuid}'`, (err, results)=>{
         try{
             if(err){
                 throw (err)
@@ -27,7 +27,7 @@ const info = (req, res)=>{
 
 //การขอรีเควสโปรไฟล์
 const profile = (req, res)=>{
-    conn.query(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
+    conn.execute(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
         if(err){
             throw err
         }
@@ -50,7 +50,7 @@ const edit = (req, res)=>{
         })
     }
 
-    conn.query(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
+    conn.execute(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
         try{
             if(err){
                 res.status(400).send({
@@ -58,7 +58,7 @@ const edit = (req, res)=>{
                     message: "ระบบผิดพลาด"
                 })
             }
-            conn.query(`UPDATE users SET fname = '${req.body.fname}', lname = '${req.body.lname}', phone = '${req.body.phone}', addr = '${req.body.addr}' WHERE uuid = '${req.userData.uuid}'`)
+            conn.execute(`UPDATE users SET fname = '${req.body.fname}', lname = '${req.body.lname}', phone = '${req.body.phone}', addr = '${req.body.addr}' WHERE uuid = '${req.userData.uuid}'`)
             try{
                 res.status(200).send({
                     status: 200,

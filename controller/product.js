@@ -3,7 +3,7 @@ var config = require('../config');
 var conn = require('../connect');
 
 const newproduct = (req, res)=>{
-    conn.query(`SELECT * FROM product WHERE status = "active" ORDER BY secretid DESC LIMIT 6`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM product WHERE status = "active" ORDER BY secretid DESC LIMIT 6`, (error, results, fields)=>{
         if(error) throw error
         var objs = [];
         if (results === undefined || results.length == 0){
@@ -30,7 +30,7 @@ const newproduct = (req, res)=>{
 
 //get product
 const products = (req, res)=>{
-    conn.query(`SELECT * FROM product WHERE status = "active" and registering = "false"`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM product WHERE status = "active" and registering = "false"`, (error, results, fields)=>{
         if(error) throw error;
         var objs = [];
         if (results === undefined || results.length == 0){
@@ -57,7 +57,7 @@ const products = (req, res)=>{
 
 //get product
 const registeringproducts = (req, res)=>{
-    conn.query(`SELECT * FROM product WHERE status = "active" and registering = "true"`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM product WHERE status = "active" and registering = "true"`, (error, results, fields)=>{
         if(error) throw error;
         var objs = [];
         if (results === undefined || results.length == 0){

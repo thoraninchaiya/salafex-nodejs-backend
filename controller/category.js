@@ -4,7 +4,7 @@ var conn = require('../connect');
 
 //get category
 const categroys = (req, res)=>{
-    conn.query(`SELECT * FROM category`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM category`, (error, results, fields)=>{
         if(error) throw error
         var objs = [];
         if (results === undefined || results.length == 0){

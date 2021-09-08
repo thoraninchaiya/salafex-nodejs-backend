@@ -2,7 +2,7 @@ var config = require('../config');
 var conn = require('../connect');
 
 const getcarousel = (req, res)=>{
-    conn.query(`SELECT * FROM carousel where status = 'active'`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM carousel where status = 'active'`, (error, results, fields)=>{
         if(error) throw error
         var objs = [];
         if (results === undefined || results.length == 0){
