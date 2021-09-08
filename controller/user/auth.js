@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 // const conn = connect.promise();
 
 const register = (req, res, next) => {
-    conn.query(`SELECT id FROM users WHERE LOWER(email) = LOWER('${req.body.email}')`, (err, results) => {
+    conn.execute(`SELECT id FROM users WHERE LOWER(email) = LOWER('${req.body.email}')`, (err, results) => {
         try{
             if(results && results.length){
                 return res.status(409).send({message: 'อีเมลล์นี้มีผู้ใช้แล้ว'});
@@ -14,11 +14,11 @@ const register = (req, res, next) => {
                     if(err){
                         return res.status(500).send({message: "ระบบล้มเหลวกรุณาติดต่อผู้ดูแลระบบ"});
                     }else{
-                        conn.query(`INSERT INTO users (email, password, fname, lname, phone, addr, uuid) VALUES (${conn.escape(req.body.email)}, '${hash}', '${req.body.fname}', '${req.body.lname}', '${req.body.phone}','${req.body.address}', '${uuidv4()}')`, (err, results) => {
+                        conn.execute(`INSERT INTO users (email, password, fname, lname, phone, addr, uuid) VALUES (${conn.escape(req.body.email)}, '${hash}', '${req.body.fname}', '${req.body.lname}', '${req.body.phone}','${req.body.address}', '${uuidv4()}')`, (err, results) => {
                             if(err){
                                 return res.status(400).send({message: "ระบบล้มเหลวกรุณาติดต่อผู้ดูแลระบบ"});
                             }
-                            conn.query(`SELECT * FROM users WHERE LOWER(email) = LOWER('${req.body.email}')`, (err, results1) =>{
+                            conn.execute(`SELECT * FROM users WHERE LOWER(email) = LOWER('${req.body.email}')`, (err, results1) =>{
                                 if(err){
                                     return res.status(400).send({message: "ระบบล้มเหลวกรุณาติดต่อผู้ดูแลระบบ"});
                                 }
@@ -34,13 +34,13 @@ const register = (req, res, next) => {
 
         }
         catch{
-            return res.status(400).send({message: "ระบบล้มเหลวกรุณาลองใหม่อีกครั้ง"});
+            return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง"});
         }
     })
 }
 
 const login = (req, res, next)=>{
-    conn.query(`SELECT * FROM users WHERE email = ${conn.escape(req.body.email)}`, (err, results) =>{
+    conn.execute(`SELECT * FROM users WHERE email = ${conn.escape(req.body.email)}`, (err, results) =>{
         try{
             if(err){
                 return res.status(400).send({message: "ระบบล้มเหลวกรุณาติดต่อผู้ดูแลระบบ"});
@@ -67,7 +67,7 @@ const login = (req, res, next)=>{
                         uuid: results[0]['uuid']
                     },
                     "SECRETKEY",{expiresIn: "1d"});
-                    conn.query(`UPDATE users SET last_login = now() WHERE uuid = '${results[0].uuid}'`);
+                    conn.execute(`UPDATE users SET last_login = now() WHERE uuid = '${results[0].uuid}'`);
                     try{
                         // console.log(results[0]);
                         return res.status(200).send({
@@ -76,7 +76,7 @@ const login = (req, res, next)=>{
                             user: results[0], //แสดง res data ตอน login
                     })
                     }catch{
-                        return res.status(400).send({message: "ระบบล้มเหลวกรุณาลองใหม่อีกครั้ง"});
+                        return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง"});
                     }
 
                 }
@@ -84,7 +84,7 @@ const login = (req, res, next)=>{
             })
         }
         catch{
-            return res.status(400).send({message: "ระบบล้มเหลวกรุณาลองใหม่อีกครั้ง"});
+            return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง"});
         }
 
     })
@@ -96,9 +96,9 @@ const route = (req, res)=>{
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, 'SECRETKEY');
 
-    conn.query(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
+    conn.execute(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
         if(err){
-            return res.status(400).send({message: "ระบบล้มเหลวกรุณาลองใหม่อีกครั้ง"});
+            return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง"});
             // throw err
         }
 
