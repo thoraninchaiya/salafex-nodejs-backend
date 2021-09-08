@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 
 //การขอคีเควสผู้ใช้
-const userinfo = (req, res)=>{
+const info = (req, res)=>{
     conn.query(`select * from users where uuid = '${req.userData.uuid}'`, (err, results)=>{
         try{
             if(err){
@@ -38,13 +38,53 @@ const profile = (req, res)=>{
             lname: results[0]['lname'],
             phone: results[0]['phone'],
             addr: results[0]['addr'],
-            last_login: results[0]['last_login'],
-            role: results[0]['role']
         })
     })
 }
 
+const edit = (req, res)=>{
+    if(!req.body.fname || !req.body.lname || !req.body.addr || !req.body.addr){
+        res.status(400).send({
+            status: 400,
+            message: "กรุณากรอกข้อมูลให้ครบถ้วน"
+        })
+    }
+
+    conn.query(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
+        try{
+            if(err){
+                res.status(400).send({
+                    status: 400,
+                    message: "ระบบผิดพลาด"
+                })
+            }
+            conn.query(`UPDATE users SET fname = '${req.body.fname}', lname = '${req.body.lname}', phone = '${req.body.phone}', addr = '${req.body.addr}' WHERE uuid = '${req.userData.uuid}'`)
+            try{
+                res.status(200).send({
+                    status: 200,
+                    message: "บันทึกข้อมูลสำเร็จ"
+                })
+            }
+            catch{
+                return res.status(400).send({
+                    message: "ข้อมูลผิดพลาดกรุณากรอกใหม่",
+                    status: 400
+                })
+            }
+
+        }
+        catch{
+            return res.status(400).send({
+                message: "กรุณาติดต่อผู้ดูแลระบบ",
+                status: 400
+            })
+        }
+
+    })
+}
+
 module.exports = {
-    userinfo,
-    profile
+    info,
+    profile,
+    edit
 }

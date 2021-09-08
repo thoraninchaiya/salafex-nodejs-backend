@@ -5,9 +5,9 @@ const user = require('../../controller/user/user');
 const auth = require('../../controller/user/auth');
 
 
-router.get('/info', userMiddleware.isLoggedIn, user.userinfo)
-router.get('/profile', userMiddleware.isLoggedIn, user.userinfo)
-
+router.get('/info', userMiddleware.isLoggedIn, user.info)
+router.get('/profile', userMiddleware.isLoggedIn, user.profile)
+router.put('/edit', userMiddleware.isLoggedIn, user.edit)
 
 router.post('/register', userMiddleware.validateRegister, auth.register)
 router.post('/login', auth.login)
