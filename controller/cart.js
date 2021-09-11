@@ -27,12 +27,12 @@ const getcart = (req, res) => {
                     }
                     for (var i = 0;i < cartresult.length; i++){
                         objs.push({
-                            cid: cartresult[i].cid,
-                            id: cartresult[i].secretid,
+                            cid: cartresult[i]['cart_id'],
+                            id: cartresult[i]['secretid'],
                             image: config.mainUrl + config.imagePath + cartresult[i].image,
                             name: cartresult[i]['name'],
                             price: cartresult[i]['price'],
-                            qty: cartresult[i]['cqty'],
+                            qty: cartresult[i]['cart_qty'],
                         });
                     }
                     res.setHeader("Content-Type", "application/json");
@@ -56,25 +56,44 @@ const getcart = (req, res) => {
 
 // add cart
 const addcart = (req, res) => {
-    // console.log(req)
-    // conn.execute(`select * from product`, (err, results) =>{
-    //     if(err){
-    //         throw err
-    //     }
-    //     return res.status(200).send({
-    //         product: results
-    //     })
-    // })
-    if(!req.body.name){
-        return res.status(400).send({
-            message: "กรุณาติดต่อผู้ดูแลระบบ",
-            status: 400
+    // console.log(req.body)
+    // console.log(req.userDataInfo)
+    conn.execute(`select * from product where id = '${req.body.pid}' and status = 'active'`, (err, productresults) =>{
+        if(err){
+            throw(err)
+        }
+        if(productresults === undefined || productresults.length == 0){
+            return res.status(400).send({
+                message: "ไม่พบสินค้า",
+                status: 400
+            })
+        }
+        conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['id']}', '${req.body.qty}')`, (err, cartinsertresults) => {
+            try{
+                console.log(cartinsertresults)
+                if(err){
+                    console.log(cartinsertresults)
+                    return res.status(400).send({
+                        message: "เกิดข้อผิดพลาด",
+                        status: 400
+                    })
+                }
+                return res.status(200).send({
+                    message: "เพิ่มสินค้าลงตะกร้าสำเร็จ",
+                    status: 200
+                })
+            }catch{
+                return res.status(400).send({
+                    message: "เกิดข้อผิดพลาด",
+                    status: 400
+                })
+            }
         })
-    }
-    return res.status(200).send({
-        message: "success",
-        userdata: req.userData,
-        body: req.body
+
+        // console.log(productresults)
+        // return res.status(200).send({
+        //     message: "data",
+        // })
     })
 }
 

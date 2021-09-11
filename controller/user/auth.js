@@ -84,7 +84,7 @@ const login = (req, res, next)=>{
             })
         }
         catch{
-            return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง"});
+            return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง", status: 400});
         }
 
     })

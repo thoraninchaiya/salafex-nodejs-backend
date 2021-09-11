@@ -1,7 +1,4 @@
 var conn = require('../../connect');
-const { v4: uuidv4 } = require('uuid');
-
-
 
 //การขอคีเควสผู้ใช้
 const info = (req, res)=>{
