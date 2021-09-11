@@ -68,32 +68,51 @@ const addcart = (req, res) => {
                 status: 400
             })
         }
-        conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['id']}', '${req.body.qty}')`, (err, cartinsertresults) => {
+        conn.execute(`select * from cart where cart_status = 'pending' and product_id = '${req.body.pid}'`, (err, cartcheckstatus) => {
             try{
-                console.log(cartinsertresults)
-                if(err){
-                    console.log(cartinsertresults)
-                    return res.status(400).send({
-                        message: "เกิดข้อผิดพลาด",
-                        status: 400
+                if(cartcheckstatus === undefined || cartcheckstatus.length == 0){
+                    conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['id']}', ${req.body.qty})`, (err, cartinsertresults) => {
+                        try{
+                            if(err){
+                                console.log(err)
+                                return res.status(400).send({
+                                    message: "เกิดข้อผิดพลาด",
+                                    status: 400
+                                })
+                            }
+                            return res.status(200).send({
+                                message: "เพิ่มสินค้าลงตะกร้าสำเร็จ",
+                                status: 200
+                            })
+                        }catch{
+                            return res.status(400).send({
+                                message: "เกิดข้อผิดพลาด",
+                                status: 400
+                            })
+                        }
+                    })
+                }else{
+                    conn.execute(`update cart set cart_qty = cart_qty + ${req.body.qty} where product_id = '${productresults[0]['id']}' and cart_status = 'pending'`, (updateerr, updateproductstatus) => {
+                        if(updateerr){
+                            return res.status(400).send({
+                                message: "เกิดข้อผิดพลาด",
+                                status: 400
+                            })
+                        }
+                        return res.status(200).send({
+                            message: "เพิ่มสินค้าลงตะกร้าสำเร็จ",
+                            status: 200
+                        })
                     })
                 }
-                return res.status(200).send({
-                    message: "เพิ่มสินค้าลงตะกร้าสำเร็จ",
-                    status: 200
-                })
-            }catch{
+            }
+            catch{
                 return res.status(400).send({
-                    message: "เกิดข้อผิดพลาด",
+                    message: "ระบบผิดพลาด 1",
                     status: 400
                 })
             }
         })
-
-        // console.log(productresults)
-        // return res.status(200).send({
-        //     message: "data",
-        // })
     })
 }
 
