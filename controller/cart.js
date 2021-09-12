@@ -10,7 +10,7 @@ const getcart = (req, res) => {
                     status: 400
                 })
             }
-            conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.id WHERE users_id = '${userresults[0]['id']}'`, (err, cartresult) => {
+            conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.id WHERE users_id = '${userresults[0]['id']}' and cart_status = 1 `, (err, cartresult) => {
                 var objs = [];
                 try{
                     if(err){
@@ -29,6 +29,7 @@ const getcart = (req, res) => {
                         objs.push({
                             cid: cartresult[i]['cart_id'],
                             id: cartresult[i]['secretid'],
+                            productid: cartresult[i]['product_id'],
                             image: config.mainUrl + config.imagePath + cartresult[i].image,
                             name: cartresult[i]['name'],
                             price: cartresult[i]['price'],

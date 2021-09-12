@@ -1,9 +1,11 @@
 // import URL from '../../config';
 var config = require('../config');
 var conn = require('../connect');
+var onstock = null
+
 
 const newproduct = (req, res)=>{
-    conn.execute(`SELECT * FROM product WHERE status = "active" ORDER BY secretid DESC LIMIT 6`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM product WHERE status = "active" and registering = "false" ORDER BY secretid DESC LIMIT 6`, (error, results, fields)=>{
         if(error) throw error
         var objs = [];
         if (results === undefined || results.length == 0){
@@ -13,13 +15,19 @@ const newproduct = (req, res)=>{
             });
         }
         for (var i = 0;i < results.length; i++) {
+            if(results[i]['product_qty'] > 0){
+                var onstock = true
+            }else{
+                var onstock = false
+            }
             objs.push({
               id: results[i].secretid,
               cid: results[i].category_id,
               pid: results[i].id,
               name: results[i].name,
               price: results[i].price,
-              image: config.mainUrl + config.imagePath + results[i].image
+              image: config.mainUrl + config.imagePath + results[i].image,
+              onstock: onstock 
             });
         }
         res.setHeader("Content-Type", "application/json");
@@ -40,13 +48,19 @@ const products = (req, res)=>{
             });
         }
         for (var i = 0;i < results.length; i++) {
+            if(results[i]['product_qty'] > 0){
+                var onstock = true
+            }else{
+                var onstock = false
+            }
             objs.push({
               id: results[i].secretid,
               cid: results[i].category_id,
               pid: results[i].id,
               name: results[i].name,
               price: results[i].price,
-              image: config.mainUrl + config.imagePath + results[i].image
+              image: config.mainUrl + config.imagePath + results[i].image,
+              onstock: onstock              
             });
         }
         res.setHeader("Content-Type", "application/json");
@@ -67,13 +81,19 @@ const registeringproducts = (req, res)=>{
             });
         }
         for (var i = 0;i < results.length; i++) {
+            if(results[i]['product_qty'] > 0){
+                var onstock = true
+            }else{
+                var onstock = false
+            }
             objs.push({
               id: results[i].secretid,
               cid: results[i].category_id,
               pid: results[i].id,
               name: results[i].name,
               price: results[i].price,
-              image: config.mainUrl + config.imagePath + results[i].image
+              image: config.mainUrl + config.imagePath + results[i].image,
+              onstock: onstock
             });
         }
         res.setHeader("Content-Type", "application/json");
