@@ -109,7 +109,7 @@ const addcart = (req, res) => {
             }
             catch{
                 return res.status(400).send({
-                    message: "ระบบผิดพลาด 1",
+                    message: "ระบบผิดพลาด",
                     status: 400
                 })
             }
@@ -119,13 +119,85 @@ const addcart = (req, res) => {
 
 //update cart
 const updatecart = (req, res) => {
+    if(!req.body.status){
+        return res.status(400).send({
+            message: "เกิดขข้อมผิดพลาด",
+            status: 400
+        })
+    }
+    if(req.body.status == "add"){
+        qtystate = '+1'
+    }
+    if(req.body.status == "minus"){
+        qtystate = '-1'
+    }
+    conn.execute(`select * from product where id = '${req.body.productid}'`, (err, selectresults) => {
+        if(err){
+            // throw err
+            return res.status(400).send({
+                message: "ระบบผิดพลาด",
+                status: 400
+            })
+        }
+        try{
+            if(selectresults === undefined || selectresults.length == 0){
+                return res.status(400).send({
+                    message: "ไม่พบสินค้า",
+                    status: 400
+                })
+            }
 
+            conn.execute(`update cart set cart_qty = cart_qty ${qtystate} where cart_id = ${req.body.cid} and product_id = '${selectresults[0]['id']}'`, (err, updatecartresults) => {
+                if(err){
+                    throw err
+                }
+                try{
+                    
+                    return res.status(200).send({
+                        status: 200,
+                        message: "เพิ่มจำนวนสินค้าสำเร็จ"
+                    })
+                }
+                catch{
+                    return res.status(400).send({
+                        message: "ระบบผิดพลาด",
+                        status: 400
+                    })
+                }
+            })
+
+        }catch{
+            return res.status(400).send({
+                message: "ระบบผิดพลาด",
+                status: 400
+            })
+        }
+    })
 }
 
 
 //remove cart
 const removecart = (req, res) => {
-    
+    conn.execute(`delete from cart where cart_id = ${req.body.cid}`, (err, results) => {
+        if (err){
+            return res.status(400).send({
+                message: "ระบบผิดพลาด",
+                status: 400
+            })
+        }
+        try{
+            return res.status(200).send({
+                message: "ลบสินค้าเร็จ",
+                status: 200
+            })
+        }
+        catch{
+            return res.status(400).send({
+                message: "ระบบผิดพลาด",
+                status: 400
+            })
+        }
+    })
 }
 
 // const test = ['cat','dog','wolf']
