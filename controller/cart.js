@@ -20,9 +20,9 @@ const getcart = (req, res) => {
                         })
                     }
                     if(cartresult === undefined || cartresult.length == 0){
-                        return res.status(400).send({
+                        return res.status(204).send({
                             message: "ไม่มีสินค้าในตะกร้าสินค้า",
-                            status: 400
+                            status: 204
                         })
                     }
                     for (var i = 0;i < cartresult.length; i++){
@@ -131,7 +131,7 @@ const updatecart = (req, res) => {
     if(req.body.status == "minus"){
         qtystate = '-1'
     }
-    console.log(req.body)
+    // console.log(req.body)
     conn.execute(`select * from product where id = '${req.body.productid}'`, (err, selectresults) => {
         if(err){
             // throw err
@@ -148,11 +148,25 @@ const updatecart = (req, res) => {
         }
 
         conn.execute(`update cart set cart_qty = cart_qty ${qtystate} where cart_id = ${req.body.cid} and product_id = '${selectresults[0]['id']}'`, (err, updatecartresults) => {
-            console.log(updatecartresults)
-            console.log("update")
+            // console.log(updatecartresults)
+            // console.log("update")
             if(err){
                 throw err
             }
+
+            conn.execute(`select * from cart where cart_id = ${req.body.cid}`, (err, selectresutlstodelete)=>{
+                if(err){
+                    throw err
+                }
+                // console.log(selectresutlstodelete)
+                if(selectresutlstodelete[0]['cart_qty'] === 0){
+                    conn.execute(`delete from cart where cart_id = ${req.body.cid}`, (err, results) => {
+                        if(err){
+                            throw err
+                        }
+                    })
+                }
+            })
             return res.status(200).send({
                 status: 200,
                 message: "เพิ่มจำนวนสินค้าสำเร็จ"
