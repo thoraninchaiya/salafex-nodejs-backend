@@ -17,6 +17,7 @@ app.use('/img/carousel', express.static(path.join(__dirname, 'store/image/carous
 const carousel = require('./router/view/carousel'); //carousel
 const product = require('./router/view/product'); //product
 const category = require('./router/view/category'); //category
+const purchase = require('./router/view/purchase'); //category
 const cart = require('./router/user/cart'); //cart
 const user = require('./router/user/user'); //cuser
 
@@ -26,6 +27,8 @@ app.use('/product', product)
 app.use('/category', category)
 app.use('/cart', cart)
 app.use('/user', user)
+app.use('/purchase', purchase)
+
 
 app.delete('/test', (req, res)=>{
   console.log(req.body)

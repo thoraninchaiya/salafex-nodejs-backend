@@ -73,6 +73,8 @@ const addcart = (req, res) => {
             try{
                 if(cartcheckstatus === undefined || cartcheckstatus.length == 0){
                     conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['id']}', ${req.body.qty})`, (err, cartinsertresults) => {
+                        // console.log(cartinsertresults)
+                        // console.log(cartinsertresults.insertId)
                         try{
                             if(err){
                                 console.log(err)

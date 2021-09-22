@@ -66,7 +66,8 @@ const login = (req, res, next)=>{
                         email: results[0]['email'],
                         uuid: results[0]['uuid']
                     },
-                    "SECRETKEY",{expiresIn: "1d"});
+                    // "SECRETKEY",{expiresIn: "1d"});
+                    "SECRETKEY",{expiresIn: "7d"});
                     conn.execute(`UPDATE users SET last_login = now() WHERE uuid = '${results[0].uuid}'`);
                     try{
                         // console.log(results[0]);
@@ -91,7 +92,7 @@ const login = (req, res, next)=>{
 }
 
 const route = (req, res)=>{
-    console.log(req.userData);
+    // console.log(req.userData);
     const authHeader = req.headers.authorization;
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, 'SECRETKEY');
