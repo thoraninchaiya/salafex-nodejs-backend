@@ -5,7 +5,7 @@ const connection = mysql.createPool({
     user: 'root',
     password: '251242',
     database: 'salafex',
-    queueLimit: 1000
+    queueLimit: 500
 });
 
 
