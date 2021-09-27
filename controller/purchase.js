@@ -6,18 +6,20 @@ const checkout = (req, res) => {
         if(selecterror){
             throw(selecterror)
         }
-        // console.log(selectresults)
         conn.execute(`INSERT INTO orders (users_id, order_serial) VALUES (${req.userDataInfo.id}, 'serial')`, (inserterr, inserresults) =>{
             if(inserterr) throw inserterr
             const incart = selectresults
             incart.forEach(element => {
-                conn.execute(`INSERT INTO orders_details(order_id, product_id, order_qty, product_total_amt) VALUES (${inserresults.insertId}, '${element.product_id}', ${element.cart_qty}, ${element.cart_qty * element.price})`, (detailerr, detailresults) => {
+                conn.execute(`INSERT INTO orders_details(order_id, product_id, order_qty, product_total_amt, product_prict_unit) VALUES (${inserresults.insertId}, '${element.product_id}', ${element.cart_qty}, ${element.cart_qty * element.price}, ${element.price})`, (detailerr, detailresults) => {
                     if(detailerr) throw detailerr
-                    // console.log(detailresults)
-                    // console.log(element)
                     conn.execute(`UPDATE orders a INNER JOIN (SELECT order_id, SUM(product_total_amt) as total FROM orders_details GROUP BY order_id) b ON a.order_id = b.order_id SET a.order_total_amt = b.total WHERE a.order_id = ${inserresults.insertId}`, (orderamterr, orderamtresults) => {
                         if(orderamterr) throw orderamterr
-                        // console.log(orderamtresults)
+                    })
+                    conn.execute(`UPDATE product SET product_qty = product_qty - ${element.cart_qty}, sold_qty = sold_qty + ${element.cart_qty} WHERE id = '${element.product_id}'`, (producterr, productresults) => {
+                        if(producterr) throw producterr
+                    })
+                    res.send({
+                        status: 200
                     })
                 })
             })
