@@ -32,30 +32,38 @@ const categroys = (req, res)=>{
 const categroy = (req, res)=>{
     // console.log(req)
     // console.log(req.params)
-    conn.execute(`SELECT * FROM category a INNER JOIN product b ON a.category_id = b.category_id WHERE a.category_status = 'active' AND a.category_id = ${req.params.id} AND b.status = 'active'`, (cerr, cresults) => {
-        if(cerr) throw cerr
-        var objs = [];
-        if(cresults == undefined || cresults.length == 0){
-            console.log("Empty")
-            res.status(400).send({
-                status: 400,
-                message: "Category Item Empty!"
+    conn.execute(`SELECT * FROM category a INNER JOIN product b ON a.category_id = b.category_id WHERE a.category_status = 'active' AND a.category_id = ${req.body.id} AND b.status = 'active'`, (cerr, cresults) => {
+        try{
+            if(cerr) throw cerr
+            var objs = [];
+            if(cresults == undefined || cresults.length == 0){
+                console.log("Empty")
+                res.status(400).send({
+                    status: 400,
+                    message: "Category Item Empty!"
+                })
+            }
+            // console.log(cresults)
+            for (var i = 0;i < cresults.length; i++) {
+                objs.push({
+                    secretid: cresults[i].secretid,
+                    id: cresults[i].id,
+                    name: cresults[i].name,
+                    price: cresults[i].price,
+                    detail: cresults[i].category_dtails,
+                    image: config.mainUrl + config.imagePath + cresults[i].image
+                });
+            }
+            res.status(200).send({
+                results: objs,
             })
         }
-        // console.log(cresults)
-        for (var i = 0;i < cresults.length; i++) {
-            objs.push({
-                secretid: cresults[i].secretid,
-                id: cresults[i].id,
-                name: cresults[i].name,
-                price: cresults[i].price,
-                detail: cresults[i].category_dtails,
-                image: config.mainUrl + config.imagePath + cresults[i].image
+        catch{
+            return res.status(400).send({
+                status: 404
             });
         }
-        res.status(200).send({
-            results: objs,
-        })
+
     })
 }
 
