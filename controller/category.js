@@ -24,7 +24,10 @@ const categroys = (req, res)=>{
         }
         res.setHeader("Content-Type", "application/json");
         res.send(JSON.stringify(objs));
-        res.end();
+        // res.end();
+        // res.status(200).send({
+        //     objs
+        // })
     })
 }
 
@@ -32,7 +35,7 @@ const categroys = (req, res)=>{
 const categroy = (req, res)=>{
     // console.log(req)
     // console.log(req.params)
-    conn.execute(`SELECT * FROM category a INNER JOIN product b ON a.category_id = b.category_id WHERE a.category_status = 'active' AND a.category_id = ${req.body.id} AND b.status = 'active'`, (cerr, cresults) => {
+    conn.execute(`SELECT * FROM category a INNER JOIN product b ON a.category_id = b.category_id WHERE a.category_status = 'active' AND a.category_id = ${req.params.id} AND b.status = 'active'`, (cerr, cresults) => {
         try{
             if(cerr) throw cerr
             var objs = [];

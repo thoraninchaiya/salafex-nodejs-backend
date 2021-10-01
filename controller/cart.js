@@ -36,9 +36,9 @@ const getcart = (req, res) => {
                             qty: cartresult[i]['cart_qty'],
                         });
                     }
-                    res.setHeader("Content-Type", "application/json");
+                    // res.setHeader("Content-Type", "application/json");
                     res.send(JSON.stringify(objs));
-                    res.end();
+                    // res.end();
                 }catch{
                     return res.status(400).send({
                         message: "กรุณาติดต่อผู้ดูแลระบบ",
