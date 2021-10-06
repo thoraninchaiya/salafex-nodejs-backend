@@ -36,7 +36,7 @@ const getcart = (req, res) => {
                             qty: cartresult[i]['cart_qty'],
                         });
                     }
-                    // res.setHeader("Content-Type", "application/json");
+                    res.setHeader("Content-Type", "application/json");
                     res.send(JSON.stringify(objs));
                     // res.end();
                 }catch{

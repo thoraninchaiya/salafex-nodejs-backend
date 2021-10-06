@@ -6,6 +6,7 @@ var path = require('path');
 const bodyParser = require('body-parser');
 app.use(express.json());
 app.use(cors())
+// response.headers("Content-Type", "application/json");
 
 app.use(express.static('store/image/product'))
 
@@ -29,6 +30,18 @@ app.use('/cart', cart)
 app.use('/user', user)
 app.use('/purchase', purchase)
 
+
+//admin router
+const adminproduct = require('./router/admin/product'); //admin product router
+const adminuser = require('./router/admin/user'); //admin user router
+
+
+//admin use
+app.use('/admin/product', adminproduct) //admin product use
+app.use('/admin/user', adminuser) //admin user use
+
+
+
 app.delete('/test', (req, res)=>{
   console.log(req.body)
   res.status(200).send({
@@ -36,6 +49,10 @@ app.delete('/test', (req, res)=>{
     body: req.body
   })
 })
+
+
+
+
 
 // const userdata = require('./controller/user/user');
 
