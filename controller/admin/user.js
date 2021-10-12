@@ -3,6 +3,10 @@ var config = require('../../config');
 
 const getusers = (req, res)=>{
     conn.execute(`SELECT * FROM users`,(geterr, getresults)=>{
+        // conn.execute(`SHOW COLUMNS FROM users LIKE 'role'`,(colerr, colresult)=>{
+            // if(colerr) throw colerr
+            // console.log(colresult[0]['Type'])
+        
         var objs = [];
         if(geterr) throw geterr
 
@@ -28,7 +32,20 @@ const getusers = (req, res)=>{
                 role: getresults[i]['role'],
             })
         }
-        return res.status(200).send(objs);
+        // console.log(colresult[0]['Type'])
+        // var data = colresult[0]['Type']
+        // var dataarray = data.substr(5)
+        // var maxlength = dataarray.length
+        // var dataarray1 = dataarray.substr(0,maxlength-1)
+        // console.log(dataarray1)
+        // var toarray = dataarray1.split("'")
+        // console.log(toarray)
+        // console.log()
+        // console.log(colresult[0]['Type'])
+        return res.status(200).send({
+            users: objs,
+        });
+        // })
     })
 }
 

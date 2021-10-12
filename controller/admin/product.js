@@ -44,7 +44,31 @@ const addproduct = (req, res)=>{
 }
 
 const editproduct = (req, res)=>{
-
+    if(req.body.type === 'updatestatus'){
+        conn.execute(`UPDATE product set status = '${req.body.status}' where id = '${req.body.id}'`,(updateerr , updateresult)=>{
+            try{
+                if(updateerr) throw updateerr
+                return res.status(200).send({
+                    status: 200,
+                    message: "อัพเดตข้อมูลสำเร็จ"
+                })
+            }catch{
+                return res.status(400).send({
+                    status: 400,
+                    message: "ระบบผิดพลาด"
+                })
+            }
+        })
+    }
+    if(req.body.type === 'updateproduct'){
+        
+    }
+    else{
+        return res.status(400).send({
+            status: 400,
+            message: "ผิดพลาด"
+        })
+    }
 }
 
 const delproduct = (req, res)=>{

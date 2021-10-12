@@ -3,9 +3,13 @@ const cors = require('cors')
 const app = express();
 const port = 8080;
 var path = require('path');
+var fileupload = require('express-fileupload')
 const bodyParser = require('body-parser');
+const fs = require('fs')
 app.use(express.json());
 app.use(cors())
+app.use(fileupload())
+
 // response.headers("Content-Type", "application/json");
 
 app.use(express.static('store/image/product'))
@@ -34,11 +38,13 @@ app.use('/purchase', purchase)
 //admin router
 const adminproduct = require('./router/admin/product'); //admin product router
 const adminuser = require('./router/admin/user'); //admin user router
+const adminpurchase = require('./router/admin/purchase'); //admin purchase router
 
 
 //admin use
 app.use('/admin/product', adminproduct) //admin product use
 app.use('/admin/user', adminuser) //admin user use
+app.use('/admin/purchase', adminpurchase) //admin purchase use
 
 
 
@@ -51,7 +57,12 @@ app.delete('/test', (req, res)=>{
 })
 
 
-
+app.post('/payment/upload', (req, res)=>{
+  console.log(req.files)
+  res.status(200).send({
+    status: 200,
+  })
+})
 
 
 // const userdata = require('./controller/user/user');

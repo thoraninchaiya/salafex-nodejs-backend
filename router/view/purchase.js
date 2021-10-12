@@ -5,6 +5,6 @@ const userMiddleware = require('../../middleware/user')
 const { userdatainfo } = require('../../controller/user/userdata');
 
 router.post('/checkout', userMiddleware.isLoggedIn, userdatainfo, purchase.checkout)
-router.get('/listcheckout', userMiddleware.isLoggedIn, purchase.listcheckout)
+router.get('/listcheckout', userMiddleware.isLoggedIn, userdatainfo, purchase.listcheckout)
 
 module.exports = router

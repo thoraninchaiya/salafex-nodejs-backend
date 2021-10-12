@@ -10,7 +10,9 @@ const getcart = (req, res) => {
                     status: 400
                 })
             }
-            conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.id WHERE users_id = '${userresults[0]['id']}' and cart_status = 1 `, (err, cartresult) => {
+
+            conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.secretid WHERE users_id = '${userresults[0]['id']}' and cart_status = 1 `, (err, cartresult) => {
+                // console.log(cartresult)
                 var objs = [];
                 try{
                     if(err){
@@ -59,7 +61,7 @@ const getcart = (req, res) => {
 const addcart = (req, res) => {
     // console.log(req.body)
     // console.log(req.userDataInfo)
-    conn.execute(`select * from product where id = '${req.body.pid}' and status = 'active'`, (err, productresults) =>{
+    conn.execute(`select * from product where secretid = '${req.body.sid}' and status = 'active'`, (err, productresults) =>{
         if(err){
             throw(err)
         }
@@ -69,10 +71,10 @@ const addcart = (req, res) => {
                 status: 400
             })
         }
-        conn.execute(`select * from cart where cart_status = 'pending' and product_id = '${req.body.pid}'`, (err, cartcheckstatus) => {
+        conn.execute(`select * from cart where cart_status = 'pending' and product_id = '${req.body.sid}'`, (err, cartcheckstatus) => {
             try{
                 if(cartcheckstatus === undefined || cartcheckstatus.length == 0){
-                    conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['id']}', ${req.body.qty})`, (err, cartinsertresults) => {
+                    conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['secretid']}', ${req.body.qty})`, (err, cartinsertresults) => {
                         // console.log(cartinsertresults)
                         // console.log(cartinsertresults.insertId)
                         try{
@@ -95,7 +97,7 @@ const addcart = (req, res) => {
                         }
                     })
                 }else{
-                    conn.execute(`update cart set cart_qty = cart_qty + ${req.body.qty} where product_id = '${productresults[0]['id']}' and cart_status = 'pending'`, (updateerr, updateproductstatus) => {
+                    conn.execute(`update cart set cart_qty = cart_qty + ${req.body.qty} where product_id = ${productresults[0]['secretid']} and cart_status = 'pending'`, (updateerr, updateproductstatus) => {
                         if(updateerr){
                             return res.status(400).send({
                                 message: "เกิดข้อผิดพลาด",
@@ -121,6 +123,7 @@ const addcart = (req, res) => {
 
 //update cart
 const updatecart = (req, res) => {
+    console.log(req.body)
     if(!req.body.status){
         return res.status(400).send({
             message: "เกิดขข้อมผิดพลาด",
@@ -134,7 +137,7 @@ const updatecart = (req, res) => {
         qtystate = '-1'
     }
     // console.log(req.body)
-    conn.execute(`select * from product where id = '${req.body.productid}'`, (err, selectresults) => {
+    conn.execute(`select * from product where secretid = '${req.body.productid}'`, (err, selectresults) => {
         if(err){
             // throw err
             return res.status(400).send({
@@ -149,7 +152,7 @@ const updatecart = (req, res) => {
             })
         }
 
-        conn.execute(`update cart set cart_qty = cart_qty ${qtystate} where cart_id = ${req.body.cid} and product_id = '${selectresults[0]['id']}'`, (err, updatecartresults) => {
+        conn.execute(`update cart set cart_qty = cart_qty ${qtystate} where cart_id = ${req.body.cid} and product_id = '${selectresults[0]['secretid']}'`, (err, updatecartresults) => {
             // console.log(updatecartresults)
             // console.log("update")
             if(err){
