@@ -48,19 +48,32 @@ app.use('/admin/purchase', adminpurchase) //admin purchase use
 
 
 
+
+
+
+app.post('/test/upload', (req, res) => {
+  if(req.files){
+    var file = req.files.file
+    var fileanmemd5 = file.md5
+    var type = file.mimetype
+    var cuttype = type.split('/')
+
+    file.mv('./store/upload/'+ fileanmemd5 + "." + cuttype[1], function(err){
+      if(err){
+        res.send(err)
+      }else{
+        res.send("file upload")
+      }
+    })
+  }
+})
+
+
 app.delete('/test', (req, res)=>{
   console.log(req.body)
   res.status(200).send({
     status: 200,
     body: req.body
-  })
-})
-
-
-app.post('/payment/upload', (req, res)=>{
-  console.log(req.files)
-  res.status(200).send({
-    status: 200,
   })
 })
 

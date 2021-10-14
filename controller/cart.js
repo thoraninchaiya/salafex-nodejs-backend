@@ -14,6 +14,7 @@ const getcart = (req, res) => {
             conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.secretid WHERE users_id = '${userresults[0]['id']}' and cart_status = 1 `, (err, cartresult) => {
                 // console.log(cartresult)
                 var objs = [];
+                var total = [];
                 try{
                     if(err){
                         return res.status(400).send({
@@ -28,6 +29,7 @@ const getcart = (req, res) => {
                         })
                     }
                     for (var i = 0;i < cartresult.length; i++){
+                        // console.log(cartresult)
                         objs.push({
                             cid: cartresult[i]['cart_id'],
                             id: cartresult[i]['secretid'],
@@ -38,9 +40,9 @@ const getcart = (req, res) => {
                             qty: cartresult[i]['cart_qty'],
                         });
                     }
-                    res.setHeader("Content-Type", "application/json");
-                    res.send(JSON.stringify(objs));
-                    // res.end();
+                    return res.status(200).send({
+                        cart: objs
+                    })
                 }catch{
                     return res.status(400).send({
                         message: "กรุณาติดต่อผู้ดูแลระบบ",
@@ -123,7 +125,7 @@ const addcart = (req, res) => {
 
 //update cart
 const updatecart = (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     if(!req.body.status){
         return res.status(400).send({
             message: "เกิดขข้อมผิดพลาด",
