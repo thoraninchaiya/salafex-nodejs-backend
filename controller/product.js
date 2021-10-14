@@ -102,8 +102,41 @@ const registeringproducts = (req, res)=>{
     })
 }
 
+
+const bestseller = (req, res) => {
+ conn.execute(`SELECT * FROM product ORDER BY sold_qty DESC LIMIT 6`, (bserr, bsresults) => {
+     if(bserr) throw bserr
+    //  console.log(bsresults)
+     var objs = [];
+
+    if (bsresults === undefined || bsresults.length == 0){
+        return res.status(400).send({
+            message: "ไม่พบข้อมูลในขณะนี้",
+            status: 404
+        });
+    }
+
+    for (var i = 0;i < bsresults.length; i++) {
+        objs.push({
+          id: bsresults[i].secretid,
+          cid: bsresults[i].category_id,
+          pid: bsresults[i].id,
+          name: bsresults[i].name,
+          price: bsresults[i].price,
+          image: config.mainUrl + config.imagePath + bsresults[i].image
+        });
+    }
+    
+    return res.status(200).send({
+        status: 200,
+        data: objs
+    })
+ })
+}
+
 module.exports = {
     products,
     newproduct,
-    registeringproducts
+    registeringproducts,
+    bestseller
 }

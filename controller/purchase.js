@@ -9,13 +9,13 @@ async function clearcheckoutfn (req, res, next) {
 }
 
 const checkout = (req, res) => {
-    conn.execute(`SELECT MAX(order_id) as max FROM orders WHERE users_id = ${req.userDataInfo.id}`, (maxerr, maxresult) => {
-        if(maxerr) throw maxerr
+    // conn.execute(`SELECT MAX(order_id) as max FROM orders WHERE users_id = ${req.userDataInfo.id}`, (maxerr, maxresult) => {
+    //     if(maxerr) throw maxerr
 
-        conn.execute(`UPDATE orders SET order_status = 4 WHERE order_status = 3 AND order_id = ${maxresult[0]['max']}`,(updatrestatuspayerr, updatestatuspayresult) => {
-            if(updatrestatuspayerr) throw updatrestatuspayerr
-        })
-    })
+    //     conn.execute(`UPDATE orders SET order_status = 4 WHERE order_status = 3 AND order_id = ${maxresult[0]['max']}`,(updatrestatuspayerr, updatestatuspayresult) => {
+    //         if(updatrestatuspayerr) throw updatrestatuspayerr
+    //     })
+    // })
     conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.secretid WHERE users_id = ${req.userDataInfo.id} AND cart_status = 'pending'`, (selecterror, selectresults) => {
         // console.log(selectresults)
         if(selecterror){
@@ -94,7 +94,7 @@ const betacheckout = (req, res) => {
 const listcheckout = (req, res) => {
     // console.log(req.userDataInfo)
     var objs = []
-    conn.execute(`SELECT * FROM orders a INNER JOIN orders_details b ON a.order_id = b.order_id INNER JOIN product c ON b.product_id = c.secretid WHERE a.order_status = 'waitingpayment' AND a.users_id = ${req.userDataInfo.id} ORDER BY a.order_id DESC`, (carterr, cartresults) => {
+    conn.execute(`SELECT * FROM orders a INNER JOIN orders_details b ON a.order_id = b.order_id INNER JOIN product c ON b.product_id = c.secretid WHERE a.order_status = 2 AND a.users_id = ${req.userDataInfo.id} ORDER BY a.order_id DESC LIMIT 1`, (carterr, cartresults) => {
         if(carterr) throw carterr 
 
         if(cartresults === undefined || cartresults.length == 0){
