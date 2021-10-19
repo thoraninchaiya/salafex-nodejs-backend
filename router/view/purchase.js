@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const purchase = require('../../controller/purchase');
+const {checkout, listcheckout, receipt, payment} = require('../../controller/purchase');
 const userMiddleware = require('../../middleware/user')
-const { clearcheckoutfn } = require('../../controller/purchase');
+const { orderlist} = require('../../controller/purchase');
 const { userdatainfo } = require('../../controller/user/userdata');
 
-router.post('/checkout', userMiddleware.isLoggedIn, userdatainfo, purchase.checkout)
-router.get('/listcheckout', userMiddleware.isLoggedIn, userdatainfo, purchase.listcheckout)
+router.post('/checkout', userMiddleware.isLoggedIn, userdatainfo, checkout, receipt)
+router.get('/listcheckout', userMiddleware.isLoggedIn, userdatainfo, listcheckout)
+router.post('/receipt/payment', userMiddleware.isLoggedIn, userdatainfo, payment)
+// router.post('/order', userMiddleware.isLoggedIn, userdatainfo)
 
 module.exports = router

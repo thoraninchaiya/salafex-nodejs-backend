@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors')
 const app = express();
 const port = 8080;
+const util = require('util')
 var path = require('path');
 var fileupload = require('express-fileupload')
 const bodyParser = require('body-parser');
@@ -9,8 +10,6 @@ const fs = require('fs')
 app.use(express.json());
 app.use(cors())
 app.use(fileupload())
-
-// response.headers("Content-Type", "application/json");
 
 app.use(express.static('store/image/product'))
 
@@ -52,20 +51,28 @@ app.use('/admin/purchase', adminpurchase) //admin purchase use
 
 
 app.post('/test/upload', (req, res) => {
-  if(req.files){
-    var file = req.files.file
-    var fileanmemd5 = file.md5
-    var type = file.mimetype
-    var cuttype = type.split('/')
+  console.log(req.files)
+  const datapayment = req.body
+  console.log(datapayment)
 
-    file.mv('./store/upload/'+ fileanmemd5 + "." + cuttype[1], function(err){
-      if(err){
-        res.send(err)
-      }else{
-        res.send("file upload")
-      }
-    })
-  }
+  // if(req.files){
+  //   var file = req.files.file
+  //   var fileanmemd5 = file.md5
+  //   var type = file.mimetype
+  //   var cuttype = type.split('/')
+
+  //   file.mv('./store/upload/'+ fileanmemd5 + "." + cuttype[1], function(err){
+  //     if(err){
+  //       res.send(err)
+  //     }else{
+  //       res.send("file upload")
+  //     }
+  //   })
+  // }
+})
+
+app.post('/test/upload/payment', (req, res) => {
+  console.log(req.body)
 })
 
 
