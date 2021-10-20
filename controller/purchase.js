@@ -116,7 +116,7 @@ function listcheckout (req, res) {
     var orderdetail = []
     conn.execute(`SELECT * FROM receipt WHERE receipt_status = 1 AND users_id = ${req.userDataInfo.id} ORDER BY receipt_id DESC LIMIT 1`, (recerr, recresults) => {
         if (recerr) throw recerr
-        console.log(recresults)
+        // console.log(recresults)
         if(recresults == undefined || recresults.length == 0 ){
             return res.status(400).send({
                 status: 400,
@@ -162,14 +162,51 @@ function listcheckout (req, res) {
 }
 
 function payment(req, res) {
-    if(!req.body){
+    // console.log(req.body)
+    if(!req.body && !req.files){
         return res.status(400).send({
             status: 400
         })
     }
+    if(!req.body.receiptid){
+        return res.status(400).send({
+            status: 400
+        })
+    }
+    // console.log(req.files)
     conn.execute(`SELECT * FROM receipt WHERE receipt_id = ${req.body.receiptid}`, (selrecerr, selrecresults) => {
         if(selrecerr) throw selrecerr
-        console.log(selrecresults)
+        // console.log(selrecresults)
+        if(selrecresults === undefined || selrecresults.length == 0){
+            return res.status(400).send({
+                status: 400,
+                message: "เกิดข้อผิดพลาด"
+            })
+        }
+        if(req.files){
+            var file = req.files.image
+            var fileanmemd5 = file.md5
+            var type = file.mimetype
+            var cuttype = type.split('/')
+            var filename = fileanmemd5 + "." + cuttype[1]
+            // console.log(filename)
+
+            file.mv('./store/receipt/payment/'+ fileanmemd5 + "." + cuttype[1], function(err){
+                if(err){res.send(err)}
+                else{
+                    conn.execute(`INSERT INTO payment(payment_image, payment_price, payment_time, receipt_id) VALUE ('${filename}', ${req.body.price}, '${req.body.time}', ${selrecresults[0]['receipt_id']})`, (payerr, payresults) => {
+                        if(payerr) throw payerr
+                        // console.log(payresults)
+                        conn.execute(`UPDATE receipt SET receipt_status = 2 WHERE receipt_status = 1 AND receipt_id = ${selrecresults[0]['receipt_id']}`, (ureceipterr, ureceiptresults) => {
+                            if(ureceipterr) throw ureceipterr
+                            return res.status(200).send({
+                                status: 200
+                            })
+                        })
+                    })
+                }
+            })
+        }
     })
 }
 

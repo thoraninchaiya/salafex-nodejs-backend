@@ -24,6 +24,8 @@ const category = require('./router/view/category'); //category
 const purchase = require('./router/view/purchase'); //category
 const cart = require('./router/user/cart'); //cart
 const user = require('./router/user/user'); //cuser
+const comment = require('./router/view/comment');
+
 
 //router use
 app.use('/carousel', carousel)
@@ -32,6 +34,7 @@ app.use('/category', category)
 app.use('/cart', cart)
 app.use('/user', user)
 app.use('/purchase', purchase)
+app.use('/comment', comment)
 
 
 //admin router
@@ -44,8 +47,6 @@ const adminpurchase = require('./router/admin/purchase'); //admin purchase route
 app.use('/admin/product', adminproduct) //admin product use
 app.use('/admin/user', adminuser) //admin user use
 app.use('/admin/purchase', adminpurchase) //admin purchase use
-
-
 
 
 
