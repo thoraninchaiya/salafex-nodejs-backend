@@ -5,7 +5,6 @@ var conn = require('../../connect');
 // buy product
 
 const buyproduct = (req, res) => {
-    console.log(req.userData);
     conn.execute(`SELECT * FROM users WHERE uuid = '${req.userData.uuid}'`, (err, results) =>{
         if(err){
             throw err

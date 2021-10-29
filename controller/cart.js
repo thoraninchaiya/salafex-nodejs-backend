@@ -12,7 +12,6 @@ const getcart = (req, res) => {
             }
 
             conn.execute(`SELECT * FROM cart LEFT JOIN product ON cart.product_id = product.secretid WHERE users_id = '${userresults[0]['id']}' and cart_status = 1 `, (err, cartresult) => {
-                // console.log(cartresult)
                 var objs = [];
                 var total = [];
                 try{
@@ -29,7 +28,6 @@ const getcart = (req, res) => {
                         })
                     }
                     for (var i = 0;i < cartresult.length; i++){
-                        // console.log(cartresult)
                         objs.push({
                             cid: cartresult[i]['cart_id'],
                             id: cartresult[i]['secretid'],
@@ -61,8 +59,6 @@ const getcart = (req, res) => {
 
 // add cart
 const addcart = (req, res) => {
-    // console.log(req.body)
-    // console.log(req.userDataInfo)
     conn.execute(`select * from product where secretid = '${req.body.sid}' and status = 'active'`, (err, productresults) =>{
         if(err){
             throw(err)
@@ -77,11 +73,8 @@ const addcart = (req, res) => {
             try{
                 if(cartcheckstatus === undefined || cartcheckstatus.length == 0){
                     conn.execute(`INSERT INTO cart(users_id, product_id, cart_qty) VALUES (${req.userDataInfo.id}, '${productresults[0]['secretid']}', ${req.body.qty})`, (err, cartinsertresults) => {
-                        // console.log(cartinsertresults)
-                        // console.log(cartinsertresults.insertId)
                         try{
                             if(err){
-                                console.log(err)
                                 return res.status(400).send({
                                     message: "เกิดข้อผิดพลาด",
                                     status: 400
@@ -125,7 +118,6 @@ const addcart = (req, res) => {
 
 //update cart
 const updatecart = (req, res) => {
-    // console.log(req.body)
     if(!req.body.status){
         return res.status(400).send({
             message: "เกิดขข้อมผิดพลาด",
@@ -138,7 +130,6 @@ const updatecart = (req, res) => {
     if(req.body.status == "minus"){
         qtystate = '-1'
     }
-    // console.log(req.body)
     conn.execute(`select * from product where secretid = '${req.body.productid}'`, (err, selectresults) => {
         if(err){
             // throw err
@@ -155,8 +146,6 @@ const updatecart = (req, res) => {
         }
 
         conn.execute(`update cart set cart_qty = cart_qty ${qtystate} where cart_id = ${req.body.cid} and product_id = '${selectresults[0]['secretid']}'`, (err, updatecartresults) => {
-            // console.log(updatecartresults)
-            // console.log("update")
             if(err){
                 throw err
             }
@@ -165,7 +154,6 @@ const updatecart = (req, res) => {
                 if(err){
                     throw err
                 }
-                // console.log(selectresutlstodelete)
                 if(selectresutlstodelete[0]['cart_qty'] === 0){
                     conn.execute(`delete from cart where cart_id = ${req.body.cid}`, (err, results) => {
                         if(err){
@@ -192,7 +180,6 @@ const updatecart = (req, res) => {
 
 //remove cart
 const removecart = (req, res) => {
-    // console.log(req.body)
     conn.execute(`delete from cart where cart_id = ${req.body.cid}`, (err, results) => {
 
         if (err){

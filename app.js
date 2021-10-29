@@ -11,7 +11,10 @@ app.use(express.json());
 app.use(cors())
 app.use(fileupload())
 
-app.use(express.static('store/image/product'))
+const userMiddleware = require('./middleware/user')
+const { checkadmin } = require('./controller/admin/admin');
+
+// app.use(express.static('store/image/product'))
 
 app.use('/img/product', express.static(path.join(__dirname, 'store/image/product')))
 app.use('/img/carousel', express.static(path.join(__dirname, 'store/image/carousel')))
@@ -25,7 +28,7 @@ const purchase = require('./router/view/purchase'); //category
 const cart = require('./router/user/cart'); //cart
 const user = require('./router/user/user'); //cuser
 const comment = require('./router/view/comment');
-
+const delivery = require('./router/user/delivery');
 
 //router use
 app.use('/carousel', carousel)
@@ -35,13 +38,12 @@ app.use('/cart', cart)
 app.use('/user', user)
 app.use('/purchase', purchase)
 app.use('/comment', comment)
-
+app.use('/delivery', delivery)
 
 //admin router
 const adminproduct = require('./router/admin/product'); //admin product router
 const adminuser = require('./router/admin/user'); //admin user router
 const adminpurchase = require('./router/admin/purchase'); //admin purchase router
-
 
 //admin use
 app.use('/admin/product', adminproduct) //admin product use
@@ -49,6 +51,8 @@ app.use('/admin/user', adminuser) //admin user use
 app.use('/admin/purchase', adminpurchase) //admin purchase use
 
 
+//ขอรีเควสการดึงรูปโดยแอดมิน
+app.use('/admin/img/payment', express.static(path.join(__dirname, 'store/receipt/payment')))
 
 
 app.post('/test/upload', (req, res) => {
@@ -72,10 +76,10 @@ app.post('/test/upload', (req, res) => {
   // }
 })
 
-app.post('/test/upload/payment', (req, res) => {
+app.post('/test', (req, res)=>{
   console.log(req.body)
-})
-
+  console.log(req.files)
+}) 
 
 app.delete('/test', (req, res)=>{
   console.log(req.body)

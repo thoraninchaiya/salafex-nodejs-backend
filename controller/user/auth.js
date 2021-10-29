@@ -55,7 +55,6 @@ const login = (req, res, next)=>{
                 return res.status(400).send({message: "อีเมลล์หรือรหัสผ่านที่ท่านกรอกผิด"});
             }
             bcrypt.compare(req.body.password, results[0]['password'], (bErr, bResults) =>{
-                // console.log(results[0]['password'])
                 if(bErr){
                     return res.status(400).send({
                         message: "อีเมลล์หรือรหัสผิด"
@@ -70,18 +69,17 @@ const login = (req, res, next)=>{
                     "SECRETKEY",{expiresIn: "7d"});
                     conn.execute(`UPDATE users SET last_login = now() WHERE uuid = '${results[0].uuid}'`);
                     try{
-                        // console.log(results[0]);
                         return res.status(200).send({
                             message: "เข้าสู่ระบบสำเร็จ",
                             token,
                             user: results[0], //แสดง res data ตอน login
                     })
                     }catch{
-                        return res.status(400).send({message: "ระบบผิดพลาดกรุณาลองใหม่อีกครั้ง"});
+                        return res.status(400).send({message: "อีเมลล์หรือรหัสผ่านผิด"});
                     }
 
                 }
-                return res.status(400).send({message: "อีเมลล์หรือรหัสผิด"});
+                return res.status(400).send({message: "อีเมลล์หรือรหัสผ่านผิด"});
             })
         }
         catch{
@@ -92,7 +90,6 @@ const login = (req, res, next)=>{
 }
 
 const route = (req, res)=>{
-    // console.log(req.userData);
     const authHeader = req.headers.authorization;
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, 'SECRETKEY');

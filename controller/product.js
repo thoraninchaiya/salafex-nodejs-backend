@@ -60,7 +60,8 @@ const products = (req, res)=>{
               name: results[i].name,
               price: results[i].price,
               image: config.mainUrl + config.imagePath + results[i].image,
-              onstock: onstock              
+              onstock: onstock,
+              pdetail: results[i]['details']
             });
         }
         res.setHeader("Content-Type", "application/json");
@@ -94,12 +95,11 @@ const registeringproducts = (req, res)=>{
               name: results[i].name,
               price: results[i].price,
               image: config.mainUrl + config.imagePath + results[i].image,
-              onstock: onstock
+              onstock: onstock,
+              pdetail: results[i].details
             });
         }
 
-        // console.log(req)
-        // console.log(req.userData)
         return res.status(200).send({
             product: objs
         })
@@ -110,7 +110,6 @@ const registeringproducts = (req, res)=>{
 function bestseller(req, res) {
  conn.execute(`SELECT * FROM product ORDER BY sold_qty DESC LIMIT 6`, (bserr, bsresults) => {
      if(bserr) throw bserr
-    //  console.log(bsresults)
      var objs = [];
 
     if (bsresults === undefined || bsresults.length == 0){
@@ -138,46 +137,9 @@ function bestseller(req, res) {
  })
 }
 
-function registering(req, res) {
-    // console.log(req.userDataInfo.id)
-    // console.log(req.body)
-    conn.execute(`SELECT * FROM product WHERE secretid = ${req.body.pid} AND registering = 2`,(selproducterr, selproductresults) =>{
-        if(selproducterr) throw selproducterr
-
-        if(selproductresults === undefined || selproductresults.length == 0){
-            return res.status(400).send({
-                status: 400,
-                message: "เกิดข้อผิดพลาด"
-            })
-        }
-
-        conn.execute(`SELECT * FROM random WHERE product_id = ${req.body.pid} AND user_id = ${req.userDataInfo.id} AND random_status = 1`, (selrandomerr, selresultseresults) => {
-            if(selrandomerr) throw selrandomerr
-            // console.log(selresultseresults)
-            if(selresultseresults === undefined || selresultseresults.length == 0){
-                conn.execute(`INSERT INTO random(product_id, user_id, random_status) VALUES (${selproductresults[0]['secretid']}, ${req.userDataInfo.id}, 1)`, (insrandomerr, insrandomresults) =>{
-                    if(insrandomerr) throw insrandomerr
-                    // console.log(insrandomresults)
-                    return res.status(200).send({
-                        status: 200,
-                        message: "ลงทะเบียนสำเร็จ"
-                    })
-                })
-            }else{
-                return res.status(400).send({
-                    status: 400,
-                    message: "ท่านได้ลงทะเบียนเรียบร้อยแล้ว"
-                })
-            }
-        })
-    })
-
-}
-
 module.exports = {
     products,
     newproduct,
     registeringproducts,
     bestseller,
-    registering
 }

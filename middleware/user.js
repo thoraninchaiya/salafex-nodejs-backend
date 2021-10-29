@@ -29,7 +29,7 @@ module.exports = {
         // console.log(req)
         if(!req.headers.authorization){
             return res.status(400).send({
-                message: "กรุณาเข้าสู่ระบบใหม่",
+                message: "กรุณาเข้าสู่ระบบ",
                 status: 401
             })
         }
@@ -41,7 +41,7 @@ module.exports = {
             next();
         } catch(err) {
             return res.status(400).send({
-                message: "กรุณาเข้าสู่ระบบใหม่",
+                message: "กรุณาเข้าสู่ระบบ",
                 status: 401
             })
         }

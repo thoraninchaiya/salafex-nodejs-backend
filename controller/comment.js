@@ -2,9 +2,6 @@ var config = require('../config');
 var conn = require('../connect');
 
 function add(req, res){
-    // console.log(req.params)
-    // console.log(req.body)
-    // console.log(req.userDataInfo)
     if(!req.params.productid || !req.body.comment || !req.body.rating){
         return res.status(400).send({
             status: 400,
@@ -22,7 +19,6 @@ function add(req, res){
             })
         }
 
-        // console.log(selproductresults)
         conn.execute(`INSERT INTO comment(users_id, product_id, comment_detail, comment_rating) VALUES (${req.userDataInfo.id}, ${selproductresults[0]['secretid']}, '${req.body.comment}', ${req.body.rating})`,(inscommenterr, inscommentresults) => {
             if(inscommenterr) throw inscommenterr
             return res.status(200).send({
@@ -41,10 +37,8 @@ function show(req, res) {
             message: "Error Methods"
         })
     }
-    // console.log(req.params.productid)
     conn.execute(`SELECT * FROM comment a INNER JOIN users b ON a.users_id = b.id WHERE product_id = ${req.params.productid}`, (selcomerr, selcomresults) => {
         if(selcomerr) throw selcomerr
-        // console.log(selcomresults)
         if(selcomresults === undefined || selcomresults.length == 0){
             return res.status(400).send({
                 status: 400,
