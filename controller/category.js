@@ -70,7 +70,7 @@ const categroy = (req, res)=>{
                         name: cresults[i].name,
                         pid: cresults[i].id,
                         price: cresults[i].price,
-                        detail: cresults[i].category_dtails,
+                        pdetail: cresults[i].details,
                         image: config.mainUrl + config.imagePath + cresults[i].image,
                         onstock: true
                     });
