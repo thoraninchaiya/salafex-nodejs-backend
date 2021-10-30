@@ -27,7 +27,8 @@ const newproduct = (req, res)=>{
               name: results[i].name,
               price: results[i].price,
               image: config.mainUrl + config.imagePath + results[i].image,
-              onstock: onstock 
+              onstock: onstock,
+              pdetail: results[i].details
             });
         }
         res.setHeader("Content-Type", "application/json");
@@ -38,7 +39,7 @@ const newproduct = (req, res)=>{
 
 //get product
 const products = (req, res)=>{
-    conn.execute(`SELECT * FROM product WHERE status = "active" and registering = "false"`, (error, results, fields)=>{
+    conn.execute(`SELECT * FROM product WHERE status = 1 and registering = "false"`, (error, results, fields)=>{
         if(error) throw error;
         var objs = [];
         if (results === undefined || results.length == 0){

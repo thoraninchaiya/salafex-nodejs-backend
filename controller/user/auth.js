@@ -72,7 +72,6 @@ const login = (req, res, next)=>{
                         return res.status(200).send({
                             message: "เข้าสู่ระบบสำเร็จ",
                             token,
-                            user: results[0], //แสดง res data ตอน login
                     })
                     }catch{
                         return res.status(400).send({message: "อีเมลล์หรือรหัสผ่านผิด"});

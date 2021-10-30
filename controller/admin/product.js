@@ -59,16 +59,15 @@ const getproduct = (req, res)=>{
 
 
 const addproduct = (req, res)=>{
-    console.log(req.body.product_name)
+    // console.log(req.body.product_name)
     if(!req.body || !req.files){
         return res.status(400).send({
             status: 400,
-            message: "ข้อมูลผิดพลาด"
+            message: "กรุณาตรวจสอข้อมูลใหม่"
         })
     }
     conn.execute(`SELECT * FROM product WHERE LOWER(id) = LOWER('${req.body.product_name}')`,(selecterr, selectresults) => {
         if(selecterr) throw err
-        // console.log(selectresults)
         if(selectresults === undefined || selectresults.length == 0){
             if(req.files){
                 var file = req.files.image
@@ -117,9 +116,15 @@ const editproductstatus = (req, res)=>{
             }
         })
     }
-    // if(req.body.type === 'updateproduct'){
-        
-    // }
+    if(req.body.type === 'updateproduct'){
+        conn.execute(`UPDATE product SET id = '${req.body.product_id}', cost = ${req.body.product_cost}, category_id = ${req.body.category_id}, details = '${req.body.product_detail}', name = '${req.body.product_name}', price = ${req.body.product_price}, product_qty = ${req.body.product_qty}, status = ${req.body.product_status_code}, registering = ${req.body.product_registering_code} WHERE secretid = ${req.body.secretid}`, (updateerr, updateresults) =>{
+            if(updateerr) throw updateerr
+            return res.send({
+                status: 200,
+                message: "แก้ไขข้อมูลสินค้าสำเร็จ"
+            })
+        })
+    }
     else{
         return res.status(400).send({
             status: 400,
@@ -128,13 +133,90 @@ const editproductstatus = (req, res)=>{
     }
 }
 
-const delproduct = (req, res)=>{
-    console.log(req)
+function delproduct (req, res){
+    
+    // console.log(req.body)
+    conn.execute(`SELECT * FROM orders_details WHERE product_id = ${req.body.secretid}`, (selectdetailerr, selectdetailresults) => {
+        if(selectdetailerr) throw selectdetailerr
+        if(selectdetailresults === undefined || selectdetailresults.length == 0){
+            conn.execute(`DELETE FROM product WHERE secretid = ${req.body.secretid}`, (delitemerr, delitemresults) => {
+                if (delitemerr) throw delitemerr
+            })
+            return res.status(200).send({
+                status: 200,
+                message: "ลบสินค้าสำเร็จ"
+            })
+        }
+        return res.status(400).send({
+            status: 400,
+            message: "ไม่สามารถลบสินค้าได้"
+        })
+    })
 }
+
+function getproductregistering(req, res) {
+    var objs = []
+    var count = []
+    var statuscode = 0
+    conn.execute(`SELECT * FROM product WHERE registering = 2`, (selerr, selresults) => {
+        if(selerr) throw selerr
+        // console.log(selresults)
+        for(var i=0;i < selresults.length; i++){
+            // conn.execute(`SELECT product_id,COUNT(*) as count FROM random WHERE product_id = ${selresults[i]['secretid']} GROUP BY product_id`, (counterr, countresults) => {
+            //     if(counterr) throw counterr
+            //     console.log(countresults)
+            //     for(var ia=0; a < countresults; a++){
+            //         count.
+            //     }
+            // })
+            switch(selresults[i]['registering']){
+                case 'false' :
+                    registeringcode = 1
+                    break;
+                case 'true' :
+                    registeringcode = 2 
+                    break;
+            }
+
+            objs.push({
+                secretid: selresults[i]['secretid'],
+                product_id: selresults[i]['id'],
+                category_id: selresults[i]['category_id'],
+                product_detail: selresults[i]['details'],
+                product_name: selresults[i]['name'],
+                product_registering: selresults[i]['registering'],
+                product_qty: selresults[i]['product_qty'],
+                product_registering_code: registeringcode,
+                product_image: config.mainUrl + config.imagePath + selresults[i].image,
+            })
+            if(i === 3){
+                    continue
+                }
+        }
+        
+        res.send({
+            status: 200,
+            data: objs
+        })
+    })
+}
+
+function counting(x, y){
+    console.log(x)
+    console.log(y)
+    return new Promise((resolve, reject) => {
+        setTimeout(()=>{
+            resolve("Delay Hello");
+        }, 1000);
+    });
+}
+
+// execute(say, "aloha");
 
 module.exports = {
     getproduct,
     addproduct,
     editproductstatus,
-    delproduct
+    delproduct,
+    getproductregistering,
 }

@@ -11,11 +11,6 @@ app.use(express.json());
 app.use(cors())
 app.use(fileupload())
 
-const userMiddleware = require('./middleware/user')
-const { checkadmin } = require('./controller/admin/admin');
-
-// app.use(express.static('store/image/product'))
-
 app.use('/img/product', express.static(path.join(__dirname, 'store/image/product')))
 app.use('/img/carousel', express.static(path.join(__dirname, 'store/image/carousel')))
 
@@ -44,12 +39,13 @@ app.use('/delivery', delivery)
 const adminproduct = require('./router/admin/product'); //admin product router
 const adminuser = require('./router/admin/user'); //admin user router
 const adminpurchase = require('./router/admin/purchase'); //admin purchase router
+const admindashboard = require('./router/admin/dashboard'); //admin purchase router
 
 //admin use
 app.use('/admin/product', adminproduct) //admin product use
 app.use('/admin/user', adminuser) //admin user use
 app.use('/admin/purchase', adminpurchase) //admin purchase use
-
+app.use('/admin/dashboard', admindashboard) //admin dashboard
 
 //ขอรีเควสการดึงรูปโดยแอดมิน
 app.use('/admin/img/payment', express.static(path.join(__dirname, 'store/receipt/payment')))

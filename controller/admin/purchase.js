@@ -11,7 +11,7 @@ function order (req, res){
                 status: 404
             });
         }
-        conn.execute(`SELECT count(*) FROM orders where day(order_datetime)=day(now())`, (dayerr, dayresults) => {
+        conn.execute(`SELECT count(*) FROM orders WHERE day(order_datetime)=day(now())`, (dayerr, dayresults) => {
             if(dayerr) throw dayerr
         
         // for(var i=0;i < orderresult.length; i++){
