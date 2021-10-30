@@ -4,6 +4,7 @@ const {getproduct, addproduct, editproductstatus, delproduct, getproductregister
 const userMiddleware = require('../../middleware/user')
 const { checkadmin } = require('../../controller/admin/admin');
 
+// http://localhost:8080/admin/product/
 // router.get('/', userMiddleware.isLoggedIn ,product.getproduct)
 router.get('/', userMiddleware.isLoggedIn, checkadmin, getproduct)
 router.post('/new', userMiddleware.isLoggedIn, checkadmin, addproduct)
