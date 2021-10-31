@@ -10,11 +10,10 @@ function getinfo(req, res) {
         })
     }
     const objs = []
-    conn.execute(`SELECT product_id,COUNT(*) as count FROM random a INNER JOIN product b ON a.product_id = b.secretid WHERE product_id = ${req.body.product_id} AND random_status = 1`,(counterr, countresults)=>{
+    conn.execute(`SELECT product_id,COUNT(*) as count FROM random a INNER JOIN product b ON a.product_id = b.secretid WHERE product_id = ${req.body.product_id} AND random_status = 1 `,(counterr, countresults)=>{
 
-        conn.execute(`SELECT * FROM random a INNER JOIN users b ON a.user_id = b.id WHERE product_id = ${req.body.product_id} AND random_status = 1`,(selrandomlisterr, selrandomlistresults) =>{
+        conn.execute(`SELECT * FROM random a INNER JOIN users b ON a.user_id = b.id WHERE product_id = ${req.body.product_id} AND random_status = 1 OR random_status = 2 OR random_status = 4`,(selrandomlisterr, selrandomlistresults) =>{
             if(selrandomlisterr) throw selrandomlisterr
-            // console.log(selrandomlistresults)
             var registering_code = null
 
             for(var i = 0; i < selrandomlistresults.length; i++){
@@ -55,7 +54,6 @@ function getinfo(req, res) {
 }
 
 function register(req, res) {
-    console.log(req.body)
     const reqcount = parseInt(req.body.count)
     var randomlist = []
     //{ product_id: 6, count: '10' }
@@ -86,7 +84,6 @@ function register(req, res) {
                 var i = 1
                 function loop(){
                     setTimeout(() => {
-                        // console.log("Hello " + i)
                         conn.execute(`SELECT * FROM random WHERE product_id = ${req.body.product_id} AND random_status = 1`, (selrandomlooperr, selrandomloopresults) =>{
                             if(selrandomlooperr) throw selrandomlooperr
                             var randomcount = random.int((min = 0), (max = reqcount))
@@ -101,8 +98,7 @@ function register(req, res) {
                         }
                     }, 500);
                     if(i >= reqcount){
-                        console.log("")
-                        res.send({
+                        return res.send({
                             status: 200,
                             message: "ดำเนินการสุ่มเรียบร้อย"
                         })
@@ -116,11 +112,9 @@ function register(req, res) {
 }
 
 function getregisternoconfirm(req, res){
-    console.log(req.body)
     objs = []
     conn.execute(`SELECT * FROM random_cash a INNER JOIN users b ON a.cash_user_id = b.id WHERE cash_product_id = ${req.body.product_id}`, (selerr, selresults) =>{
         if(selerr) throw selerr
-        // console.log(selresults)
         if(selresults === undefined || selresults.length == 0){
             return res.status(400).send({
                 status: 400,
@@ -136,7 +130,76 @@ function getregisternoconfirm(req, res){
         }
         return res.send({
             status: 200,
-            data: objs
+            data: objs,
+            message: "ดึงข้อมูลสำเร็จ"
+        })
+    })
+}
+
+function clearregisternoconfirm(req, res){
+    objs = []
+    conn.execute(`SELECT * FROM random_cash WHERE cash_product_id = ${req.body.product_id}`, (selerr, selresults) =>{
+        if(selerr) throw selerr
+        if(selresults === undefined || selresults.length == 0){
+            return res.status(400).send({
+                status: 400,
+                message: "ไม่พบข้อมูล"
+            })
+        }
+        conn.execute(`DELETE FROM random_cash WHERE cash_product_id = ${req.body.product_id}`, (delerr, delresults) =>{
+            if(delerr) throw delerr
+            
+            return res.send({
+                status: 200,
+                message: "ลบสำเร็จ"
+            })
+        })
+    })
+}
+
+function confirm(req, res) {
+    console.log(req.body)
+    conn.execute(`SELECT * FROM random_cash WHERE cash_product_id = ${req.body.product_id}`, (selerr, selresults)=>{
+        if(selerr) throw selerr
+        var data = selresults
+        var i = 0
+        function loop(){
+            setTimeout(() => {
+                conn.execute(`UPDATE random SET random_status = 2 WHERE product_id = ${req.body.product_id} AND user_id = ${data[i]['cash_user_id']} AND random_status = 1`, (updateerr, updateresults) =>{
+                  if(updateerr) throw updateerr
+                })
+
+                i++
+                if(i < selresults.length){
+                    loop()
+                }
+            }, 500);
+            if(i >= selresults.length){
+                return res.send({
+                    status: 200,
+                    message: "ยืนยันผลการสุ่มสำเร็จ"
+                })
+            }
+        }
+        loop();
+        
+    })
+}
+
+function success(req, res) {
+    var objs = []
+    conn.execute(`SELECT * FROM random a INNER JOIN users b ON a.user_id = b.id WHERE product_id = ${req.body.product_id} AND random_status = 2 OR random_status = 4`,(selrandomlisterr, selrandomlistresults) =>{
+        if(selrandomlisterr) throw selrandomlisterr
+        var registering_code = null
+
+        for(var i = 0; i < selrandomlistresults.length; i++){
+            objs.push({
+                user: selrandomlistresults[i]['fname'] + ' ' + selrandomlistresults[i]['lname']
+            })
+        }
+        return res.send({
+            status: 200,
+            data: objs,
         })
     })
 }
@@ -145,4 +208,7 @@ module.exports = {
     getinfo,
     register,
     getregisternoconfirm,
+    clearregisternoconfirm,
+    confirm,
+    success
 }
