@@ -36,6 +36,7 @@ const getproduct = (req, res)=>{
                     registeringcode = 2 
                     break;
             }
+
             objs.push({
                 secretid: getresults[i]['secretid'],
                 product_id: getresults[i]['id'],
