@@ -100,21 +100,14 @@ const addproduct = (req, res)=>{
 }
 
 const editproductstatus = (req, res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     if(req.body.type === 'updatestatus'){
         conn.execute(`UPDATE product set status = ${req.body.status} where id = '${req.body.id}'`,(updateerr , updateresult)=>{
-            try{
-                if(updateerr) throw updateerr
-                return res.status(200).send({
-                    status: 200,
-                    message: "อัพเดตข้อมูลสำเร็จ"
-                })
-            }catch{
-                return res.status(400).send({
-                    status: 400,
-                    message: "ระบบผิดพลาด"
-                })
-            }
+            if(updateerr) throw updateerr
+            return res.status(200).send({
+                status: 200,
+                message: "อัพเดตข้อมูลสำเร็จ"
+            })
         })
     }
     if(req.body.type === 'updateproduct'){
@@ -124,12 +117,6 @@ const editproductstatus = (req, res)=>{
                 status: 200,
                 message: "แก้ไขข้อมูลสินค้าสำเร็จ"
             })
-        })
-    }
-    else{
-        return res.status(400).send({
-            status: 400,
-            message: "ผิดพลาด"
         })
     }
 }
