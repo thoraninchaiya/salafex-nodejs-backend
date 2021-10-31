@@ -40,12 +40,14 @@ const adminproduct = require('./router/admin/product'); //admin product router
 const adminuser = require('./router/admin/user'); //admin user router
 const adminpurchase = require('./router/admin/purchase'); //admin purchase router
 const admindashboard = require('./router/admin/dashboard'); //admin purchase router
+const banner = require('./router/admin/banner'); //admin banner
 
 //admin use
 app.use('/admin/product', adminproduct) //admin product use
 app.use('/admin/user', adminuser) //admin user use
 app.use('/admin/purchase', adminpurchase) //admin purchase use
 app.use('/admin/dashboard', admindashboard) //admin dashboard
+app.use('/admin/banner', banner) //admin banner
 
 //ขอรีเควสการดึงรูปโดยแอดมิน
 app.use('/admin/img/payment', express.static(path.join(__dirname, 'store/receipt/payment')))

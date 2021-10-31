@@ -111,6 +111,13 @@ function cancelreceipts(req, res) {
 }
 
 function getreceipt(req, res) {
+    if(!req.body.receiptid){
+        return res.status(400).send({
+            status: 400,
+            message: "ผิดพลาด"
+        })
+    }
+
     var data = []
     var main = []
     var payment = []
@@ -139,7 +146,6 @@ function getreceipt(req, res) {
                         image: config.mainUrl + config.adminpaymentslip + selpaymentresults[0]['payment_image']
                     })
                 }
-                
                 
                 main.push({
                     receiptid: selrecresults[0]['receipt_id'],

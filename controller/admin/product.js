@@ -60,13 +60,15 @@ const getproduct = (req, res)=>{
 
 const addproduct = (req, res)=>{
     // console.log(req.body.product_name)
+    // console.log(req.body)
     if(!req.body || !req.files){
         return res.status(400).send({
             status: 400,
             message: "กรุณาตรวจสอข้อมูลใหม่"
         })
     }
-    conn.execute(`SELECT * FROM product WHERE LOWER(id) = LOWER('${req.body.product_name}')`,(selecterr, selectresults) => {
+
+    conn.execute(`SELECT * FROM product WHERE id = '${req.body.product_id}'`,(selecterr, selectresults) => {
         if(selecterr) throw err
         if(selectresults === undefined || selectresults.length == 0){
             if(req.files){
@@ -89,7 +91,6 @@ const addproduct = (req, res)=>{
                     message: "เพิ่มข้อมูลสำเร็จ"
                 })
             }
-            
         }
         return res.status(400).send({
             status: 400,
