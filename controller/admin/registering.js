@@ -117,7 +117,7 @@ function register(req, res) {
 
 function getregisternoconfirm(req, res){
     console.log(req.body)
-    objs = [];
+    objs = []
     conn.execute(`SELECT * FROM random_cash a INNER JOIN users b ON a.cash_user_id = b.id WHERE cash_product_id = ${req.body.product_id}`, (selerr, selresults) =>{
         if(selerr) throw selerr
         // console.log(selresults)
