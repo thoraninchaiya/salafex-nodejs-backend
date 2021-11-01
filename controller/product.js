@@ -73,7 +73,7 @@ const products = (req, res)=>{
 
 //get product
 const registeringproducts = (req, res)=>{
-    
+    // console.log(req)
     conn.execute(`SELECT * FROM product WHERE status = "active" and registering = "true"`, (error, results, fields)=>{
         if(error) throw error;
         var objs = [];

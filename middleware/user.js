@@ -30,7 +30,7 @@ module.exports = {
         if(!req.headers.authorization){
             return res.status(400).send({
                 message: "กรุณาเข้าสู่ระบบ",
-                status: 401
+                status: 400
             })
         }
         try {
@@ -42,7 +42,7 @@ module.exports = {
         } catch(err) {
             return res.status(400).send({
                 message: "กรุณาเข้าสู่ระบบ",
-                status: 401
+                status: 400
             })
         }
     }

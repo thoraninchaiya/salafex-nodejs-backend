@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const product = require('../../controller/product');
 const { userdatainfo } = require('../../controller/user/userdata');
-const { registering, getregistering, success } = require('../../controller/registering');
+const { registering, getregistering, success, addcart } = require('../../controller/registering');
 const userMiddleware = require('../../middleware/user')
 
 
@@ -15,5 +15,7 @@ router.get('/bestseller', product.bestseller)
 router.post('/registering', userMiddleware.isLoggedIn ,userdatainfo, registering)
 router.get('/registering/users/:product', getregistering)
 router.get('/registering/users/success/:product', success)
+
+router.post('/registering/cart/', userMiddleware.isLoggedIn ,userdatainfo, addcart)
 
 module.exports = router
