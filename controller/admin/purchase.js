@@ -111,6 +111,7 @@ function cancelreceipts(req, res) {
 }
 
 function getreceipt(req, res) {
+    
     if(!req.body.receiptid){
         return res.status(400).send({
             status: 400,
@@ -134,6 +135,7 @@ function getreceipt(req, res) {
             }
 
             conn.execute(`SELECT * FROM payment WHERE receipt_id = ${req.body.receiptid}`, (selpaymenterr, selpaymentresults) => {
+                // console.log(selpaymentresults)
                 if(selpaymenterr) throw selpaymenterr
                 if(selpaymentresults === undefined || selpaymentresults.length == 0){
                     payment.push({
@@ -143,7 +145,9 @@ function getreceipt(req, res) {
                 }else{
                     payment.push({
                         status: 200,
-                        image: config.mainUrl + config.adminpaymentslip + selpaymentresults[0]['payment_image']
+                        image: config.mainUrl + config.adminpaymentslip + selpaymentresults[0]['payment_image'],
+                        payment_price: selpaymentresults[0]['payment_price'],
+                        payment_time: selpaymentresults[0]['payment_time'],
                     })
                 }
                 
@@ -210,7 +214,7 @@ function updatedelivery(req, res) {
 
 function deliverylist(req, res) {
     let objs= []
-    conn.execute(`SELECT * FROM delivery_category_company`,(deliverycompanyerr, deliverycompanyresults) => {
+    conn.execute(`SELECT * FROM delivery_category_company WHERE delivery_category_company_status = 1`,(deliverycompanyerr, deliverycompanyresults) => {
         if(deliverycompanyerr) throw deliverycompanyerr
         if(deliverycompanyresults === undefined || deliverycompanyresults.length == 0){
             return res.status(400).send({

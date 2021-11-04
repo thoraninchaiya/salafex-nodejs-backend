@@ -144,7 +144,7 @@ const updatecart = (req, res) => {
                 status: 400
             })
         }
-
+        // console.log(selectresults)
         conn.execute(`update cart set cart_qty = cart_qty ${qtystate} where cart_id = ${req.body.cid} and product_id = '${selectresults[0]['secretid']}'`, (err, updatecartresults) => {
             if(err){
                 throw err

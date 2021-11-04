@@ -70,16 +70,18 @@ function add(req, res) {
 }
 
 function edit(req, res) {
-    if(!req.body.id || !req.body.type || !req.body.status_code){
+    console.log(req.body)
+    console.log(req.files)
+    if(!req.body.banner_id || !req.body.type || !req.body.banner_status_code){
         return res.status(400).send({
             status: 400,
             message: "ผิดพลาด"
         })
     }
-    conn.execute(`SELECT * FROM carousel WHERE id = ${req.body.id}`, (err, results)=>{
+    conn.execute(`SELECT * FROM carousel WHERE id = ${req.body.banner_id}`, (err, results)=>{
         if(err) throw err
         if(req.body.type === 'updatestatus'){
-            conn.execute(`UPDATE carousel SET status = ${req.body.status_code} WHERE id = ${req.body.id}`, (uerr, uresults) =>{
+            conn.execute(`UPDATE carousel SET status = ${req.body.status_code} WHERE id = ${req.body.banner_id}`, (uerr, uresults) =>{
                 if(uerr) throw uerr
                 return res.send({
                     status: 200,
@@ -87,15 +89,44 @@ function edit(req, res) {
                 })
             })
         }
-        // if(req.body.type === 'edit'){
-        //     conn.execute(`UPDATE carousel SET name = '${req.body.name} WHERE id = ${req.body.id}'`, (ueerr, ueresults) =>{
-        //         if(ueerr) throw ueerr
-        //         return res.send({
-        //             status: 200,
-        //             message: "แก้ไขแบนเนอร์สำเร็จ"
-        //         })
-        //     })
-        // }
+        if(req.body.type === 'edit'){
+            conn.execute(`UPDATE carousel SET status = ${req.body.banner_status_code} WHERE id = ${req.body.banner_id}`, (ueerr, ueresults) =>{
+                if(ueerr) throw ueerr
+                if(req.files){
+                    var file = req.files.image
+                    var fileanmemd5 = file.md5
+                    var type = file.mimetype
+                    var cuttype = type.split('/')
+                    var filename = fileanmemd5 + "." + cuttype[1] //ชื่อไฟล์ md5
+        
+                    file.mv('./store/image/carousel/'+ fileanmemd5 + "." + cuttype[1], function(err){
+                        if(err){res.send(err)}
+                        else{
+                            conn.execute(`UPDATE carousel SET image = '${filename}', status = ${req.body.banner_status_code} WHERE id = ${req.body.banner_id}`, (updateimgerr, updateimgresults) =>{
+                                if(updateimgerr) throw updateimgerr
+                                return res.status(200).send({
+                                    status: 200,
+                                    message: "แก้ไขข้อมูลสำเร็จ"
+                                })
+                            })
+                        }
+                    })
+                }else{
+                    return res.status(200).send({
+                        status: 200,
+                        message: "เพิ่มข้อมูลสำเร็จ"
+                    })
+                }
+            })
+            
+            // conn.execute(`UPDATE carousel SET name = '${req.body.name} WHERE id = ${req.body.id}'`, (ueerr, ueresults) =>{
+            //     if(ueerr) throw ueerr
+            //     return res.send({
+            //         status: 200,
+            //         message: "แก้ไขแบนเนอร์สำเร็จ"
+            //     })
+            // })
+        }
     })
 }
 

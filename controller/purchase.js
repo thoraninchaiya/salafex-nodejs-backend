@@ -6,6 +6,13 @@ const orderserial = orderserialgenerate.generate();
 const receiptserial = orderserialgenerate.generate();
 
 function checkout (req, res, next) {
+    console.log(req.body)
+    if(!req.body.delivery_id){
+        return res.status(400).send({
+            status: 400,
+            message: "กรุณาเลือกบริษัทขนส่ง"
+        })
+    }
     // conn.execute(`SELECT MAX(order_id) as max FROM orders WHERE users_id = ${req.userDataInfo.id}`, (maxerr, maxresult) => {
     //     if(maxerr) throw maxerr
 
@@ -15,6 +22,9 @@ function checkout (req, res, next) {
     // })
     conn.execute(`SELECT * FROM cart INNER JOIN product ON cart.product_id = product.secretid WHERE users_id = ${req.userDataInfo.id} AND cart_status = 'pending'`, (selecterror, selectresults) => {
     // conn.execute(`SELECT * FROM cart INNER JOIN product ON cart.product_id = product.secretid WHERE users_id = ${req.userDataInfo.id} AND cart_status = 'pending'`, (selecterror, selectresults) => {
+        // console.log(selectresults)
+        
+
         if(selecterror){
             throw(selecterror)
         }
@@ -22,52 +32,72 @@ function checkout (req, res, next) {
         if(selectresults === undefined || selectresults.length == 0){
             return res.status(400).send({
                 status: 400,
-                message: "ผิดพลาด"
+                message: "ผิดพลาด ไม่พบรายการซื้อสินค้าของท่าน"
             })
         }
 
-        conn.execute(`INSERT INTO orders (users_id, order_serial) VALUES (${req.userDataInfo.id}, '${orderserialgenerate.getTime(orderserial)}')`, (inserterr, inserresults) =>{
-            if(inserterr) throw inserterr
-            const incart = selectresults
-            for(var i = 0;i < selectresults.length; i++){
-
-                const cartid = selectresults[i]['cart_id']
-                const cartqty = selectresults[i]['cart_qty']
-                const productid = selectresults[i]['product_id']
-                conn.execute(`INSERT INTO orders_details(order_id, product_id, order_qty, product_total_amt, product_prict_unit) VALUES (${inserresults.insertId}, '${incart[i]['product_id']}', ${incart[i]['cart_qty']}, ${incart[i]['cart_qty'] * incart[i]['price']}, ${incart[i]['price']})`, (detailerr, detailresults) => {
-                    if(detailerr) throw detailerr
-                        
-                    conn.execute(`UPDATE cart SET cart_status = 'success' WHERE cart_id = ${cartid}`, (updatestatuserr, updatestatusresults) => {
-                        if(updatestatuserr) throw updatestatuserr
-                    })
-
-                    conn.execute(`UPDATE product SET product_qty = product_qty - ${cartqty}, sold_qty = sold_qty + ${cartqty} WHERE secretid = ${productid}`, (producterr, productresults) => {
-                        if(producterr) throw producterr
-                    })
-
-                    // conn.execute(`UPDATE orders a INNER JOIN (SELECT order_id, SUM(product_total_amt) as total FROM orders_details GROUP BY order_id) b ON a.order_id = b.order_id SET a.order_total_amt = b.total WHERE a.order_id = ${inserresults.insertId}`, (orderamterr, orderamtresults) => {
-                    //     if(orderamterr) throw orderamterr
-                    // })
-                })
-
-                if(i === 3){
-                    continue;
-                }
-            }
+        var intdata = 0
+        var row = 0
+        for(var ia = 0; ia < selectresults.length; ia++){
             
-            // res.status(200).send({
-            //     status: 200
-            // })
-            const ordercheckout = {
-                orderid: inserresults.insertId
+            row = selectresults[ia]['product_qty'] - selectresults[ia]['cart_qty']
+            if(row < 0){
+                intdata++
             }
-            req.ordercheckoutid = ordercheckout
-            next();
-        })
+        }
+
+        if(intdata == 0){
+            conn.execute(`INSERT INTO orders (users_id, order_serial, delivery_company_id) VALUES (${req.userDataInfo.id}, '${orderserialgenerate.getTime(orderserial)}', ${req.body.delivery_id})`, (inserterr, inserresults) =>{
+                if(inserterr) throw inserterr
+                const incart = selectresults
+                for(var i = 0;i < selectresults.length; i++){
+
+                    const cartid = selectresults[i]['cart_id']
+                    const cartqty = selectresults[i]['cart_qty']
+                    const productid = selectresults[i]['product_id']
+                    
+                    conn.execute(`INSERT INTO orders_details(order_id, product_id, order_qty, product_total_amt, product_prict_unit) VALUES (${inserresults.insertId}, '${incart[i]['product_id']}', ${incart[i]['cart_qty']}, ${incart[i]['cart_qty'] * incart[i]['price']}, ${incart[i]['price']})`, (detailerr, detailresults) => {
+                        if(detailerr) throw detailerr
+                            
+                        conn.execute(`UPDATE cart SET cart_status = 'success' WHERE cart_id = ${cartid}`, (updatestatuserr, updatestatusresults) => {
+                            if(updatestatuserr) throw updatestatuserr
+                        })
+
+                        conn.execute(`UPDATE product SET product_qty = product_qty - ${cartqty}, sold_qty = sold_qty + ${cartqty} WHERE secretid = ${productid}`, (producterr, productresults) => {
+                            if(producterr) throw producterr
+                        })
+
+                        // conn.execute(`UPDATE orders a INNER JOIN (SELECT order_id, SUM(product_total_amt) as total FROM orders_details GROUP BY order_id) b ON a.order_id = b.order_id SET a.order_total_amt = b.total WHERE a.order_id = ${inserresults.insertId}`, (orderamterr, orderamtresults) => {
+                        //     if(orderamterr) throw orderamterr
+                        // })
+                    })
+
+                    if(i === 3){
+                        continue;
+                    }
+                }
+                
+                // res.status(200).send({
+                //     status: 200
+                // })
+                const ordercheckout = {
+                    orderid: inserresults.insertId
+                }
+                req.ordercheckoutid = ordercheckout
+                return next();
+            })
+        }else{
+            return res.status(400).send({
+                status: 400,
+                message: "สินค้าไม่เพียงพอ"
+            })
+        }
+
     })
 }
 
 function receipt (req, res, next) {
+    // console.log(req)
     const orderid = req.ordercheckoutid.orderid
 
     if(!req.ordercheckoutid){

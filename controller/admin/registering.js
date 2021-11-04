@@ -100,12 +100,11 @@ function register(req, res) {
                     if(i >= reqcount){
                         return res.send({
                             status: 200,
-                            message: "ดำเนินการสุ่มเรียบร้อย"
+                            message: "ดำเนินการสุ่มสำเร็จ"
                         })
                     }
                 }
                 loop();
-
             }
         })
     })

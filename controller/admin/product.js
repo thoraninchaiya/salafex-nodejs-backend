@@ -60,8 +60,6 @@ const getproduct = (req, res)=>{
 
 
 const addproduct = (req, res)=>{
-    // console.log(req.body.product_name)
-    // console.log(req.body)
     if(!req.body || !req.files){
         return res.status(400).send({
             status: 400,
@@ -101,7 +99,13 @@ const addproduct = (req, res)=>{
 }
 
 const editproductstatus = (req, res)=>{
-    // console.log(req.body)
+    if(!req.body.secretid){
+        return res.status(400).send({
+            status: 400,
+            message: "ผิดพลาด"
+        })
+    }
+
     if(req.body.type === 'updatestatus'){
         conn.execute(`UPDATE product set status = ${req.body.status} where id = '${req.body.id}'`,(updateerr , updateresult)=>{
             if(updateerr) throw updateerr
@@ -112,12 +116,33 @@ const editproductstatus = (req, res)=>{
         })
     }
     if(req.body.type === 'updateproduct'){
-        conn.execute(`UPDATE product SET id = '${req.body.product_id}', cost = ${req.body.product_cost}, category_id = ${req.body.category_id}, details = '${req.body.product_detail}', name = '${req.body.product_name}', price = ${req.body.product_price}, product_qty = ${req.body.product_qty}, status = ${req.body.product_status_code}, registering = ${req.body.product_registering_code} WHERE secretid = ${req.body.secretid}`, (updateerr, updateresults) =>{
+        conn.execute(`UPDATE product SET id = '${req.body.product_id}', cost = ${req.body.product_cost}, category_id = ${req.body.category_id}, details = '${req.body.product_detail}', name = '${req.body.product_name}', price = ${req.body.product_price}, product_qty = ${req.body.product_qty}, status = ${req.body.product_status}, registering = ${req.body.product_registering_code} WHERE secretid = ${req.body.secretid}`, (updateerr, updateresults) =>{
             if(updateerr) throw updateerr
-            return res.send({
-                status: 200,
-                message: "แก้ไขข้อมูลสินค้าสำเร็จ"
-            })
+            if(req.files){
+                var file = req.files.image
+                var fileanmemd5 = file.md5
+                var type = file.mimetype
+                var cuttype = type.split('/')
+                var filename = fileanmemd5 + "." + cuttype[1] //ชื่อไฟล์ md5
+        
+                file.mv('./store/image/product/'+ fileanmemd5 + "." + cuttype[1], function(err){
+                    if(err){res.send(err)}
+                    else{
+                        conn.execute(`UPDATE product SET image = '${filename}' WHERE secretid = ${req.body.secretid}`, (updateimageerr, updateimageresults) =>{
+                            if(updateimageerr) throw updateimageerr
+                            return res.send({
+                                status: 200,
+                                message: "แก้ไขข้อมูลสินค้าสำเร็จ"
+                            })
+                        })
+                    }
+                })
+            }else{
+                return res.send({
+                    status: 200,
+                    message: "แก้ไขข้อมูลสินค้าสำเร็จ"
+                })
+            }
         })
     }
 }
@@ -125,21 +150,80 @@ const editproductstatus = (req, res)=>{
 function delproduct (req, res){
     
     // console.log(req.body)
+    if(!req.body.secretid){
+        return res.status(400).send({
+            status: 400,
+            message: "ผิดพลาด"
+        })
+    }
     conn.execute(`SELECT * FROM orders_details WHERE product_id = ${req.body.secretid}`, (selectdetailerr, selectdetailresults) => {
         if(selectdetailerr) throw selectdetailerr
         if(selectdetailresults === undefined || selectdetailresults.length == 0){
-            conn.execute(`DELETE FROM product WHERE secretid = ${req.body.secretid}`, (delitemerr, delitemresults) => {
-                if (delitemerr) throw delitemerr
+            conn.execute(`SELECT * FROM product WHERE secretid = ${req.body.secretid} AND registering = 2`, (selproducterr, selproductresults)=>{
+                if(selproducterr) throw selproducterr
+                if(selproductresults === undefined || selproductresults.length == 0){
+                    conn.execute(`DELETE FROM product WHERE secretid = ${req.body.secretid}`, (delitemerr, delitemresults) => {
+                        try {
+                            if(delitemerr){
+                                return res.status(400).send({
+                                    status: 400,
+                                    message: "ไม่สามารถลบสินค้าได้"
+                                })
+                            }
+                            if(delitemresults){
+                                return res.status(200).send({
+                                    status: 200,
+                                    message: "ลบสินค้าสำเร็จ"
+                                })
+                            }
+                        } catch (error) {
+                            return res.status(400).send({
+                                status: 400,
+                                message: "ไม่สามารถลบสินค้าได้"
+                            })
+                        }
+                    })
+                }else{
+                    conn.execute(`SELECT * FROM random WHERE product_id = ${req.body.secretid}`,(selrandomerr, selrandomresults) =>{
+                        if(selrandomerr) throw selrandomerr
+                        if(selrandomresults === undefined || selrandomresults.length == 0){
+                            conn.execute(`DELETE FROM product WHERE secretid = ${req.body.secretid}`, (delitemerr, delitemresults) => {
+                                try {
+                                    if(delitemerr){
+                                        return res.status(400).send({
+                                            status: 400,
+                                            message: "ไม่สามารถลบสินค้าได้"
+                                        })
+                                    }
+                                    if(delitemresults){
+                                        return res.status(200).send({
+                                            status: 200,
+                                            message: "ลบสินค้าสำเร็จ"
+                                        })
+                                    }
+                                } catch (error) {
+                                    return res.status(400).send({
+                                        status: 400,
+                                        message: "ไม่สามารถลบสินค้าได้"
+                                    })
+                                }
+                            })
+                        }else{
+                            return res.status(400).send({
+                                status: 400,
+                                message: "ไม่สามารถลบสินค้าได้เนื่องจากมีการลงทะเบียน"
+                            })
+                        }
+                    })
+                }
             })
-            return res.status(200).send({
-                status: 200,
-                message: "ลบสินค้าสำเร็จ"
+            
+        }else{
+            return res.status(400).send({
+                status: 400,
+                message: "ไม่สามารถลบสินค้าได้เนื่องจากมีสินค้าขายแล้ว"
             })
         }
-        return res.status(400).send({
-            status: 400,
-            message: "ไม่สามารถลบสินค้าได้"
-        })
     })
 }
 

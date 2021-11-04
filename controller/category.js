@@ -53,7 +53,7 @@ const categroy = (req, res)=>{
             categoryengname: selcetegoryresults[0]['category_name_eng'],
             categorydtails: selcetegoryresults[0]['category_dtails'],
         }
-        conn.execute(`SELECT * FROM category a INNER JOIN product b ON a.category_id = b.category_id WHERE a.category_status = 'active' AND a.category_id = ${req.params.id} AND b.status = 'active'`, (cerr, cresults) => {
+        conn.execute(`SELECT * FROM category a INNER JOIN product b ON a.category_id = b.category_id WHERE a.category_status = 'active' AND a.category_id = ${req.params.id} AND b.status = 'active' AND registering = 1`, (cerr, cresults) => {
             try{
                 if(cerr) throw cerr
                 var objs = [];
