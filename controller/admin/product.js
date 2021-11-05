@@ -148,8 +148,6 @@ const editproductstatus = (req, res)=>{
 }
 
 function delproduct (req, res){
-    
-    // console.log(req.body)
     if(!req.body.secretid){
         return res.status(400).send({
             status: 400,
@@ -233,7 +231,6 @@ function getproductregistering(req, res) {
     var statuscode = 0
     conn.execute(`SELECT * FROM product WHERE registering = 2`, (selerr, selresults) => {
         if(selerr) throw selerr
-        // console.log(selresults)
         for(var i=0;i < selresults.length; i++){
             // conn.execute(`SELECT product_id,COUNT(*) as count FROM random WHERE product_id = ${selresults[i]['secretid']} GROUP BY product_id`, (counterr, countresults) => {
             //     if(counterr) throw counterr
@@ -275,8 +272,6 @@ function getproductregistering(req, res) {
 }
 
 function counting(x, y){
-    console.log(x)
-    console.log(y)
     return new Promise((resolve, reject) => {
         setTimeout(()=>{
             resolve("Delay Hello");

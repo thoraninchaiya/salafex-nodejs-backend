@@ -84,7 +84,7 @@ function receipts (req, res){
 }
 
 function cancelreceipts(req, res) {
-    conn.execute(`SELECT * FROM receipt WHERE receipt_id = ${req.body.receiptid} `,(selrecerr, selresresults) =>{
+    conn.execute(`SELECT * FROM receipt a INNER JOIN receipt_detail b ON a.receipt_id = b.receipt_id WHERE a.receipt_id = ${req.body.receiptid} `,(selrecerr, selresresults) =>{
         if(selrecerr) throw selrecerr
         if(selresresults === undefined || selresresults.length == 0){
             return res.status(400).send({
@@ -98,11 +98,16 @@ function cancelreceipts(req, res) {
                 message: "ไม่สามารถเปลี่ยนสถานะได้"
             })
         }else{
+            for(var i = 0; i < selresresults.length; i++){
+                conn.execute(`UPDATE product SET product_qty = product_qty + ${selresresults[i]['receipt_qty']}, sold_qty = sold_qty - ${selresresults[i]['receipt_qty']} WHERE secretid = ${selresresults[i]['product_id']}`,(updatestockerr, updatestockresults) =>{
+                    if(updatestockerr) throw updatestockerr
+                })
+            }
             conn.execute(`UPDATE receipt SET receipt_status = 4 WHERE receipt_id = ${req.body.receiptid}`, (updaterecerr, updaterecresults) => {
                 if(updaterecerr) throw updaterecerr
-                res.status(200).send({
+                return res.status(200).send({
                     status: 200,
-                    message: "เปลี่ยนสถานะสำเร็จ"
+                    message: "ยกเลิกใบสั่งซื้อสำเร็จ"
                 })
             })
         }

@@ -70,8 +70,6 @@ function add(req, res) {
 }
 
 function edit(req, res) {
-    console.log(req.body)
-    console.log(req.files)
     if(!req.body.banner_id || !req.body.type || !req.body.banner_status_code){
         return res.status(400).send({
             status: 400,
@@ -81,7 +79,7 @@ function edit(req, res) {
     conn.execute(`SELECT * FROM carousel WHERE id = ${req.body.banner_id}`, (err, results)=>{
         if(err) throw err
         if(req.body.type === 'updatestatus'){
-            conn.execute(`UPDATE carousel SET status = ${req.body.status_code} WHERE id = ${req.body.banner_id}`, (uerr, uresults) =>{
+            conn.execute(`UPDATE carousel SET status = ${req.body.banner_status_code} WHERE id = ${req.body.banner_id}`, (uerr, uresults) =>{
                 if(uerr) throw uerr
                 return res.send({
                     status: 200,
