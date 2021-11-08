@@ -74,21 +74,33 @@ const products = (req, res)=>{
 //get product
 const registeringproducts = (req, res)=>{
     // console.log(req)
-    conn.execute(`SELECT * FROM product WHERE status = "active" and registering = "true"`, (error, results, fields)=>{
-        if(error) throw error;
+    conn.execute(`SELECT *,TIMESTAMPDIFF(DAY,now(),product_registering_dates_max) AS expday FROM product WHERE status = "active" and registering = 2`, (error, results, fields)=>{
+    // conn.execute(`SELECT * FROM product WHERE status = "active" and registering = 2 AND DATEDIFF(product_registering_dates_max,now()) > 1`, (error, results, fields)=>{
+        // console.log(results)
+    if(error) throw error;
         var objs = [];
+        var registeringexp = null
+
         if (results === undefined || results.length == 0){
             return res.status(400).send({
                 message: "ไม่พบข้อมูลในขณะนี้",
                 status: 404
             });
         }
+
         for (var i = 0;i < results.length; i++) {
             if(results[i]['product_qty'] > 0){
                 var onstock = true
             }else{
                 var onstock = false
             }
+
+            if(results[i]['expday'] > 0){
+                registeringexp = false
+            }else{
+                registeringexp = true
+            }
+
             objs.push({
               id: results[i].secretid,
               cid: results[i].category_id,
@@ -97,7 +109,8 @@ const registeringproducts = (req, res)=>{
               price: results[i].price,
               image: config.mainUrl + config.imagePath + results[i].image,
               onstock: onstock,
-              pdetail: results[i].details
+              pdetail: results[i].details,
+              product_registering_exp: registeringexp
             });
         }
 

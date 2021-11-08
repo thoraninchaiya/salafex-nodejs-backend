@@ -145,10 +145,44 @@ function receipt(req, res) {
     })
 }
 
+
+function cancelreceipt(req, res) {
+    conn.execute(`SELECT * FROM receipt a INNER JOIN receipt_detail b ON a.receipt_id = b.receipt_id WHERE a.receipt_id = ${req.body.receiptid}`,(selrecerr, selrecresults) =>{
+        if(selrecerr) throw selrecerr
+        console.log(selrecresults)
+        if(selrecresults === undefined || selrecresults.length == 0){
+            return res.status(400).send({
+                status: 400,
+                message: "ไม่สามารถทำรายการได้"
+            })
+        }
+        if(selrecresults[0]['receipt_status'] === "success" || selrecresults[0]['receipt_status'] === "cancel"){
+            return res.status(400).send({
+                status: 400,
+                message: "ไม่สามารถยกเลิกได้"
+            })
+        }else{
+            for(var i = 0; i < selrecresults.length; i++){
+                conn.execute(`UPDATE product SET product_qty = product_qty + ${selrecresults[i]['receipt_qty']}, sold_qty = sold_qty - ${selrecresults[i]['receipt_qty']} WHERE secretid = ${selrecresults[i]['product_id']}`,(updatestockerr, updatestockresults) =>{
+                    if(updatestockerr) throw updatestockerr
+                })
+            }
+            conn.execute(`UPDATE receipt SET receipt_status = 4 WHERE receipt_id = ${req.body.receiptid}`, (updaterecerr, updaterecresults) => {
+                if(updaterecerr) throw updaterecerr
+                return res.status(200).send({
+                    status: 200,
+                    message: "ยกเลิกใบสั่งซื้อสำเร็จ"
+                })
+            })
+        }
+    })
+}
+
 module.exports = {
     info,
     profile,
     edit,
     receipthistory,
-    receipt
+    receipt,
+    cancelreceipt
 }

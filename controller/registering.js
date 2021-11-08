@@ -115,7 +115,6 @@ function success(req, res) {
 }
 
 const addcart = (req, res) => {
-    // console.log(req.body)
     conn.execute(`select * from product where secretid = '${req.body.productid}' and status = 'active' AND registering = 2`, (err, productresults) =>{
         if(err){
             throw(err)
@@ -138,17 +137,20 @@ const addcart = (req, res) => {
                                 status: 200
                             })
                         })
+                    }else{
+                        return res.status(400).send({
+                            status: 400,
+                            message: "ท่านได้ซื้อสินค้าแล้วไม่สามารถซื้อได้"
+                        })
                     }
-                    return res.status(400).send({
-                        status: 400,
-                        message: "ท่านได้ซื้อสินค้าแล้วไม่สามารถซื้อได้"
-                    })
+                })
+            }else{
+                return res.status(400).send({
+                    status: 400,
+                    message: "ท่านได้ซื้อสินค้าแล้วไม่สามารถซื้อได้"
                 })
             }
-            return res.status(400).send({
-                status: 400,
-                message: "ท่านได้ซื้อสินค้าแล้วไม่สามารถซื้อได้"
-            })
+
         })
     })
 }

@@ -77,7 +77,7 @@ function register(req, res) {
             if(req.body.count >= selrandomresults.length){
                 return res.send({
                     status: 200,
-                    message: "ทุกท่านได้รับสินค้าเนื่องจากสินค้ามีมากกว่าลูกค้า"
+                    message: "ทุกท่านได้รับสินค้าเนื่องจากสินค้ามีมากกว่าจำนวนผู้ที่ลงทะเบียน"
                 })
             }
             if(req.body.count < selrandomresults.length){

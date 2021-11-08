@@ -6,7 +6,7 @@ const orderserial = orderserialgenerate.generate();
 const receiptserial = orderserialgenerate.generate();
 
 function checkout (req, res, next) {
-    console.log(req.body)
+    // return console.log(req.body)
     if(!req.body.delivery_id){
         return res.status(400).send({
             status: 400,
@@ -76,10 +76,7 @@ function checkout (req, res, next) {
                         continue;
                     }
                 }
-                
-                // res.status(200).send({
-                //     status: 200
-                // })
+
                 const ordercheckout = {
                     orderid: inserresults.insertId
                 }

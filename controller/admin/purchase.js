@@ -63,7 +63,6 @@ function receipts (req, res){
             }
             objs.push({
                 receiptid: selreceiptresults[i]['receipt_id'],
-                // sort: selreceiptresults[i]['receipt_id'],
                 receiptidserial: selreceiptresults[i]['receipt_serial'],
                 orderserial: selreceiptresults[i]['order_serial'],
                 name: selreceiptresults[i]['fname'] + [" "] + selreceiptresults[i]['lname'],

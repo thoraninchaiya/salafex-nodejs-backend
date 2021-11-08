@@ -66,10 +66,77 @@ function orderdetail(req, res) {
     })
 }
 
+function getdatadates(req, res) {
+    var datadate = req.body
+    if(datadate === undefined || datadate.length == 0 || !datadate){
+        return  res.status(400).send({
+            status: 400,
+            message: "กรุณาเลือกเวลาที่ต้องการข้อมูล"
+        })
+    }
+    if(datadate[0] > datadate[1]){
+       return  res.status(400).send({
+           status: 400,
+           message: "ไม่สามารถเลือกเวลาย้อนหลังได้"
+       })
+    }
+
+    var objs = []
+    var qty = []
+
+    conn.execute(`SELECT COUNT(*) as ordercount FROM orders WHERE order_datetime >= CAST('${datadate[0]}' AS DATE) AND order_datetime <= CAST('${datadate[1]}' AS DATE)`, (selcounterr, selcountresults) => {
+        if(selcounterr) throw selcounterr
+        conn.execute(`SELECT * FROM receipt a WHERE receipt_datetime >= CAST('${datadate[0]}' AS DATE)`,(selerr, selresults) =>{
+            if (selerr) throw selerr
+            conn.execute(`SELECT SUM(receipt_toal_amt) AS a,(SELECT SUM(receipt_toal_amt) FROM receipt WHERE receipt_datetime >= CAST('${datadate[0]}' AS DATE) AND receipt_datetime <= CAST('${datadate[1]}' AS DATE) AND receipt_status = 'success') AS b FROM receipt WHERE receipt_datetime >= CAST('${datadate[0]}' AS DATE) AND receipt_datetime <= CAST('${datadate[1]}' AS DATE) AND receipt_status = 'waitdelivery'`,(sumtotalerr, sumtotalresults) => {
+                if (sumtotalerr) throw sumtotalerr
+                // console.log(sumtotalresults[0]['a'] + sumtotalresults[0]['b'])
+                conn.execute(`SELECT * FROM product ORDER BY sold_qty DESC LIMIT 3`, (selectqyuerr, selecrqtyresults) =>{
+                    if(selectqyuerr) throw selectqyuerr
+
+                    for(var a=0;a < selecrqtyresults.length; a++){
+                        qty.push({
+                            name: selecrqtyresults[a]['name'],
+                            id: selecrqtyresults[a]['id'],
+                            secretid: selecrqtyresults[a]['secretid'],
+                            sold_qty: selecrqtyresults[a]['sold_qty'],
+                        })
+                    }
+
+                    for(var i=0; i < selresults.length; i++){
+                        objs.push({
+                            receipt_id: selresults[i]['receipt_id'],
+                            receipt_serial: selresults[i]['receipt_serial'],
+                            users_id :selresults[i]['users_id'],
+                            users_name: selresults[i]['user_name'],
+                            user_address: selresults[i]['user_address'],
+                            order_id: selresults[i]['order_id'],
+                            order_serial: selresults[i]['order_serial'],
+                            receipt_datetime: selresults[i]['receipt_datetime'],
+                            receipt_toal_amt: selresults[i]['receipt_toal_amt'],
+                            receipt_status: selresults[i]['receipt_status'],
+                        })
+                    }
+                    
+                    return res.send({
+                        status: 200,
+                        ordercount: {
+                            ordercount: selcountresults[0]['ordercount'],
+                            todaysales:  sumtotalresults[0]['a'] + sumtotalresults[0]['b']
+                        },
+                        orderlist: objs, 
+                        bestsellerproduct: qty,
+                    })
+                })
+            })
+        })
+    })
+}
+
 module.exports = {
     ordercount,
     orderdetail,
-
+    getdatadates,
 }
 
 // ordercount

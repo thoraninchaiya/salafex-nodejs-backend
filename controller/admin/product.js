@@ -6,55 +6,73 @@ const getproduct = (req, res)=>{
     // var sqlsearch = `SELECT * FORM product WHERE id = ?`;
     // var params = [req.params.id];
     conn.execute(`SELECT * FROM product`,(geterr, getresults)=>{
-        var objs = []
-        var statuscode = 0
-        var registeringcode = null
-        if(geterr) throw geterr
+        // conn.execute(`SELECT CURRENT_DATE() as date_min FROM product WHERE product_registering_dates_min`,(dateminerr, dateminresults)=>{
+            // conn.execute(`SELECT CURRENT_DATE() as date_max FROM product WHERE product_registering_dates_max`,(datemaxerr, datemaxresults)=>{
+                var objs = []
+                var statuscode = 0
+                var registeringcode = null
+                var datemin = null
+                var datemax = null
+                if(geterr) throw geterr
 
 
-        if (getresults === undefined || getresults.length == 0){
-            return res.status(400).send({
-                message: "ไม่พบข้อมูล",
-                status: 404
-            });
-        }
+                if (getresults === undefined || getresults.length == 0){
+                    return res.status(400).send({
+                        message: "ไม่พบข้อมูล",
+                        status: 404
+                    });
+                }
 
-        for(var i=0;i < getresults.length; i++){
-            switch(getresults[i]['status']){
-                case 'active' :
-                    statuscode = 1
-                    break;
-                case 'unactive' :
-                    statuscode = 2 
-                    break;
-            }
-            switch(getresults[i]['registering']){
-                case 'false' :
-                    registeringcode = 1
-                    break;
-                case 'true' :
-                    registeringcode = 2 
-                    break;
-            }
+                for(var i=0;i < getresults.length; i++){
+                    switch(getresults[i]['status']){
+                        case 'active' :
+                            statuscode = 1
+                            break;
+                        case 'unactive' :
+                            statuscode = 2 
+                            break;
+                    }
+                    switch(getresults[i]['registering']){
+                        case 'false' :
+                            registeringcode = 1
+                            break;
+                        case 'true' :
+                            registeringcode = 2 
+                            break;
+                    }
+                    // if(dateminresults[i]['date_min']){
+                    //     datemin = dateminresults[i]['date_min']
+                    // }
+                    // if(datemaxresults[i]['date_max']){
+                    //     datemin = datemaxresults[i]['date_max']
+                    // }
 
-            objs.push({
-                secretid: getresults[i]['secretid'],
-                product_id: getresults[i]['id'],
-                product_cost: getresults[i]['cost'],
-                category_id: getresults[i]['category_id'],
-                product_detail: getresults[i]['details'],
-                product_name: getresults[i]['name'],
-                product_price: getresults[i]['price'],
-                product_qty: getresults[i]['product_qty'],
-                sold_qty: getresults[i]['sold_qty'],
-                product_status: getresults[i]['status'],
-                product_status_code: statuscode,
-                product_registering: getresults[i]['registering'],
-                product_registering_code: registeringcode,
-                product_image: config.mainUrl + config.imagePath + getresults[i].image,
-            })
-        }
-        return res.status(200).send(objs);
+                    objs.push({
+                        secretid: getresults[i]['secretid'],
+                        product_id: getresults[i]['id'],
+                        product_cost: getresults[i]['cost'],
+                        category_id: getresults[i]['category_id'],
+                        product_detail: getresults[i]['details'],
+                        product_name: getresults[i]['name'],
+                        product_price: getresults[i]['price'],
+                        product_qty: getresults[i]['product_qty'],
+                        sold_qty: getresults[i]['sold_qty'],
+                        product_status: getresults[i]['status'],
+                        product_status_code: statuscode,
+                        product_registering: getresults[i]['registering'],
+                        product_registering_code: registeringcode,
+                        product_image: config.mainUrl + config.imagePath + getresults[i]['image'],
+                        product_registering_dates_min: getresults[i]['product_registering_dates_min'],
+                        product_registering_dates_max: getresults[i]['product_registering_dates_max'],
+                        // product_registering_date: datemin + ',' + datemax,
+                        // product_registering_date: dateminresults[i]['date_min'],
+                    })
+                }
+                return res.status(200).send(objs);                   
+        //     })
+         
+        // })
+
     })
 }
 
@@ -99,6 +117,36 @@ const addproduct = (req, res)=>{
 }
 
 const editproductstatus = (req, res)=>{
+    // {
+    //     image: 'null',
+    //     product_id: 'M106',
+    //     product_name: 'salafex mystery box',
+    //     product_cost: '5000',
+    //     product_price: '490',
+    //     product_qty: '100',
+    //     product_status: '1',
+    //     product_category: '1',
+    //     product_detail: '-',
+    //     product_registering_code: '2',
+    //     secretid: '6',
+    //     category_id: '1',
+    //     type: 'updateproduct',
+    //     product_registering_date: '2021-11-04,2021-11-11'
+    //   }
+
+    if(req.body.product_registering_date){
+        var data = req.body.product_registering_date
+        var catterdates = data.split(',')
+        if(catterdates[0] > catterdates[1]){
+
+            return res.status(400).send({
+                status: 400,
+                message: "ไม่สามารถกรอกเวลาย้อนหลังได้"
+            })
+        }
+    }
+    
+    
     if(!req.body.secretid){
         return res.status(400).send({
             status: 400,
@@ -130,6 +178,16 @@ const editproductstatus = (req, res)=>{
                     else{
                         conn.execute(`UPDATE product SET image = '${filename}' WHERE secretid = ${req.body.secretid}`, (updateimageerr, updateimageresults) =>{
                             if(updateimageerr) throw updateimageerr
+                            if(catterdates){
+                                conn.execute(`UPDATE product SET product_registering_dates_min = '${catterdates[0]}', product_registering_dates_max = '${catterdates[1]}' WHERE secretid = ${req.body.secretid}`, (updateregisteringerr, updateregisteringresults) =>{
+                                    if(updateregisteringerr) throw updateregisteringerr
+
+                                    return res.send({
+                                        status: 200,
+                                        message: "แก้ไขข้อมูลสินค้าสำเร็จ"
+                                    })
+                                })
+                            }
                             return res.send({
                                 status: 200,
                                 message: "แก้ไขข้อมูลสินค้าสำเร็จ"
@@ -138,10 +196,22 @@ const editproductstatus = (req, res)=>{
                     }
                 })
             }else{
-                return res.send({
-                    status: 200,
-                    message: "แก้ไขข้อมูลสินค้าสำเร็จ"
-                })
+                if(catterdates){
+                    conn.execute(`UPDATE product SET product_registering_dates_min = '${catterdates[0]}', product_registering_dates_max = '${catterdates[1]}' WHERE secretid = ${req.body.secretid}`, (updateregisteringerr, updateregisteringresults) =>{
+                        if(updateregisteringerr) throw updateregisteringerr
+
+                        return res.send({
+                            status: 200,
+                            message: "แก้ไขข้อมูลสินค้าสำเร็จ"
+                        })
+                    })
+                }else{
+                    return res.send({
+                        status: 200,
+                        message: "แก้ไขข้อมูลสินค้าสำเร็จ"
+                    })
+                }
+                
             }
         })
     }
@@ -257,7 +327,8 @@ function getproductregistering(req, res) {
                 product_registering: selresults[i]['registering'],
                 product_qty: selresults[i]['product_qty'],
                 product_registering_code: registeringcode,
-                product_image: config.mainUrl + config.imagePath + selresults[i].image,
+                product_image: config.mainUrl + config.imagePath + selresults[i]['image'],
+                product_registering_date: selresults[i]['product_registering_dates_min'] + ' , ' + selresults[i]['product_registering_dates_max']
             })
             if(i === 3){
                     continue
