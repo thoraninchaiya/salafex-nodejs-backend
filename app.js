@@ -2,11 +2,8 @@ const express = require('express');
 const cors = require('cors')
 const app = express();
 const port = 8080;
-const util = require('util')
 var path = require('path');
 var fileupload = require('express-fileupload')
-const bodyParser = require('body-parser');
-const fs = require('fs')
 app.use(express.json());
 app.use(cors())
 app.use(fileupload())
